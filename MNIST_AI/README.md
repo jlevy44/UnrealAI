@@ -27,6 +27,7 @@ Jordan:
 * Look up what the MNIST dataset is?
 * Read up on what neural networks are?
 I have some background here:
+* https://www.youtube.com/watch?v=aircAruvnKk
 * https://github.com/jlevy44/JupyterTests/blob/master/R/Joshua_Project_Report_Math_34.zip
 * https://github.com/jlevy44/JupyterTests/blob/master/R/LMC_Math_34_Joshua_Levy_Final_Classifiers_Test.pdf
 * Definitely consult other areas. My text is an intro, but there is much more.
