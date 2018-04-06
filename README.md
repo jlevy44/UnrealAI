@@ -39,10 +39,10 @@ Current Projects:
 * StoryAI- Hide, Joshua
 
 Here's our team so far:
-Naoki - Not sure yet
-Hide - Visualization
-Joshua - Machine Learning Programmer / Data Scientist
-Jordan - Data Scientist in Training
-Jeffrey - The Idea Man / Data Scientist / Coder
-Daniel - Modeling / Artist
-Mustafa - Not sure yet
+* Naoki - Not sure yet
+* Hide - Visualization
+* Joshua - Machine Learning Programmer / Data Scientist
+* Jordan - Data Scientist in Training
+* Jeffrey - The Idea Man / Data Scientist / Coder
+* Daniel - Modeling / Artist
+* Mustafa - Not sure yet
