@@ -23,3 +23,6 @@ Joshua Goal:
 1. Develop algorithm to ID most important words in a paragraph,
 2. post as jupyter notebook
 3. Preliminary research on how to find representative images on the web
+
+Hide Goals:
+* What do you want to work on?

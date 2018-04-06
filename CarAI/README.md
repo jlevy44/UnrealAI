@@ -33,4 +33,12 @@ Short term goals:
     * User can change how the output layer of the NN controls speed and steering, setting new values for speed and steering.
 
 Background:
+
+Using python with 3D game engine:
+* Unreal Engine: https://github.com/20tab/UnrealEnginePython
+* Unity: https://github.com/exodrifter/unity-python https://github.com/Unity-Technologies/ml-agents
+* Panda3d: https://www.panda3d.org/reference/python
+* Blender python: https://docs.blender.org/api/current/
+
+
 More details to come but I can't wait to get started!

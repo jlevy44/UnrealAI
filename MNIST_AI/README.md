@@ -41,6 +41,8 @@ Joshua:
 * I'll script some data visualization that uses [Multicore TSNE](https://github.com/DmitryUlyanov/Multicore-TSNE) to project each handwritten digit into lower dimensions, I already have PCA implemented, so this should not be a hard step
 * I'll work out my own GA + NN model and upload some tests onto the project page.
 * I'll make some new jupyter notebooks that will help Jordan answer his questions.
+* Explore using Tf-learn and tensorflow to handle these tasks.
+* Also look at: https://github.com/NicolasHug/Neural-nets
 
 Jeffrey:
 * Not sure what you have in mind, let us know!
