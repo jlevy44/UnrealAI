@@ -8,6 +8,7 @@ Without further-a-do, here are some initial projects that I'm interested in work
   * Using Genetic Algorithms and Neural Networks to have a car teach itself to drive.
   * Generate new organisms and have them teach themselves how to walk through GA + NN, Spore?
   * https://github.com/20tab/UnrealEnginePython
+  * https://github.com/magnificus/EvolutionTree
 * Generating new Music through GA + NN (Maybe LTSM) and conversion of music to and from images (deep learning)
 * Visualize a book through semantic and syntactic NLP Machine Learning and image recognition
   * Images are generated as you read the book
@@ -15,6 +16,7 @@ Without further-a-do, here are some initial projects that I'm interested in work
 * Simulating longitudinal social networks
 * Studying how anarchic organizational patterns influence social networks, and consequently the flow of ideas that can influence productivity (maybe involvement of Social Physics)
 * MNIST Tests with GAs and NN; high complexity models but trying to avoid overfitting
+* etc.
 
 These are just some ideas. I'll add more, and we can also start a blog to document our progress and show off our knowledge and new skills.
 
