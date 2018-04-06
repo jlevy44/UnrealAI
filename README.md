@@ -32,6 +32,12 @@ We need people of all backgrounds to help with development. Particularly, we nee
 Let's explore together. Stand by for updates.
 
 Update:
+
+Current Projects:
+* CarAI- Joshua, Hide, Daniel
+* MNIST_AI- Jordan, Joshua, Jeffrey
+* StoryAI- Hide, Joshua
+
 Here's our team so far:
 Naoki - Not sure yet
 Hide - Visualization
