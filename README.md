@@ -1,5 +1,7 @@
 ## Unreal AI
 
+[![Gitter](https://badges.gitter.im/UnrealAI/Lobby.svg)](https://gitter.im/UnrealAI/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge)
+
 Hey everyone! My name is Joshua Levy and I'm starting an Open Source AI project with a group of friends. There are some really interesting projects that I would like to work on as a machine learning enthusiast, and I know many people of many different talents. Believe me, this is not our day job, but I hope this serves as a medium to be expressive, intellectually stimulated, and learn some new skills along the way.
 
 Without further-a-do, here are some initial projects that I'm interested in working on:
