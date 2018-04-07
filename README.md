@@ -14,7 +14,10 @@ Without further-a-do, here are some initial projects that I'm interested in work
   * Images are generated as you read the book
 * Recreate mental images through ML on Neuron Networks in mind, cube model perhaps..
 * Simulating longitudinal social networks
+  * Social Physics - Great dataset to get started with: http://realitycommons.media.mit.edu/gallery.html
+  * http://d4d.orange.com/home
 * Studying how anarchic organizational patterns influence social networks, and consequently the flow of ideas that can influence productivity (maybe involvement of Social Physics)
+  * Concentration on idea flow (exploration and engagement) and social learning (ideas to habits, accelerated by social pressure).
 * MNIST Tests with GAs and NN; high complexity models but trying to avoid overfitting
 * etc.
 
@@ -46,3 +49,11 @@ Here's our team so far:
 * Jeffrey - The Idea Man / Data Scientist / Coder
 * Daniel - Modeling / Artist
 * Mustafa - Not sure yet
+* Alex?
+
+Lastly,
+I started a blog for our development progress on Medium. Feel free to post on our page. (though here's some interesting posts about deep social networks [1](https://medium.com/@ginab/starting-a-blog-in-2017-dont-545fcefdcb2f)[2](http://try.mightynetworks.com/better_than_a_blog/?utm_source=medium&utm_medium=article2&utm_campaign=betterthanblog2017)):
+* [Unreal AI: The Blog](https://medium.com/unreal-ai)
+
+And if you want to check out my own personal blog:
+* [Traversing the Thought Space](https://traversingthethoughtspace.wordpress.com)
