@@ -59,3 +59,6 @@ I started a blog for our development progress on Medium. Feel free to post on ou
 
 And if you want to check out my own personal blog:
 * [Traversing the Thought Space](https://traversingthethoughtspace.wordpress.com)
+
+One thing we may need to work on:
+Custom anaconda environment for development. I have my own, but we will post a tutorial about how to use Anaconda to download packages. Stay tuned!!

@@ -27,6 +27,7 @@ Jordan:
 * Look up what the MNIST dataset is?
 * Read up on what neural networks are?
 I have some background here:
+* Here's a good tutorial: https://github.com/jlevy44/UnrealAI/blob/master/MNIST_AI/joshua_work/MNIST-NeuralNetwork-and-GeneticAlgorithm-Experiments.ipynb Use this and the other material to guide you on classifying these digits!
 * https://www.youtube.com/watch?v=aircAruvnKk
 * https://github.com/jlevy44/JupyterTests/blob/master/R/Joshua_Project_Report_Math_34.zip
 * https://github.com/jlevy44/JupyterTests/blob/master/R/LMC_Math_34_Joshua_Levy_Final_Classifiers_Test.pdf
