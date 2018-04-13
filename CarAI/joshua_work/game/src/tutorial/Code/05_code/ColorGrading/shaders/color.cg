@@ -1,0 +1,35 @@
+//Cg
+
+void vshader(float4 vtx_position : POSITION,
+             out float4 l_position : POSITION,
+             out float2 l_texcoord : TEXCOORD0,
+             uniform float4 texpad_color,
+             uniform float4x4 mat_modelproj)
+{
+    l_position = mul(mat_modelproj, vtx_position);
+    l_texcoord = (vtx_position.xz * texpad_color.xy) + texpad_color.xy;
+}
+
+#define overlay_blend(base, blend) (base < 0.5 ? (2.0 * base * blend) : (1.0 - 2.0 * (1.0 - base) * (1.0 - blend)))
+#define overlay_add(base, blend) (base + blend)
+#define overlay_mul(base, blend) (base * blend)
+
+void fshader(float2 l_texcoord : TEXCOORD0,
+             uniform sampler2D k_color : TEXUNIT0,
+             out float4 o_color : COLOR)
+{
+    float gamma = 1.2;
+    gamma = 1 / gamma;
+    float3 lift = float3(1.05, 1.05, 1.1);
+    float3 blend = float3(0.1, 0.1, 0.5);
+    float weight = 0.5;
+
+    float4 color = tex2D(k_color, l_texcoord);
+
+    color.rgb = pow(color.rgb, gamma);
+    color.rgb = saturate(overlay_mul(color.rgb, lift));
+    float3 tint = saturate(overlay_blend(color.rgb, blend));
+    color.rgb = lerp(color.rgb, tint, weight);
+
+    o_color = color;
+}

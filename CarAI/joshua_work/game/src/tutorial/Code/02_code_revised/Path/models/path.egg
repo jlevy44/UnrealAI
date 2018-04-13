@@ -1,0 +1,22 @@
+<CoordinateSystem> { Z-up }
+<Group> Curve {
+  <VertexPool> Curve {
+    <Vertex> 0 {
+      -2.66117048264 -0.964361846447 0.0 1.0
+    }
+    <Vertex> 1 {
+      1.8930850029 -0.948404431343 0.0 1.0
+    }
+    <Vertex> 2 {
+      10.3484048843 1.0 0.0 1.0
+    }
+    <Vertex> 3 {
+      -3.6957449913 0.0 0.0 1.0
+    }
+  }
+  <NURBSCurve> {
+    <Order> { 4 }
+    <Knots> { 0.0 0.0 0.0 0.0 1.0 1.0 1.0 1.0 }
+    <VertexRef> { 0 1 2 3  <Ref> { Curve }}
+  }
+}

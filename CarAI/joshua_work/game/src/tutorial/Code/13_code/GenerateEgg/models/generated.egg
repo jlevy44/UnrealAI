@@ -1,0 +1,163 @@
+<Texture> color {
+  "../textures/texture.png"
+}
+<VertexPool> Vertices {
+  <Vertex> 0 {
+    -1 1 1
+    <UV> { 0 1 }
+  }
+  <Vertex> 1 {
+    -1 -1 1
+    <UV> { 0 0 }
+  }
+  <Vertex> 2 {
+    1 -1 1
+    <UV> { 1 0 }
+  }
+  <Vertex> 3 {
+    1 1 1
+    <UV> { 1 1 }
+  }
+  <Vertex> 4 {
+    1 1 -1
+    <UV> { 0 1 }
+  }
+  <Vertex> 5 {
+    1 -1 -1
+    <UV> { 0 0 }
+  }
+  <Vertex> 6 {
+    -1 -1 -1
+    <UV> { 1 0 }
+  }
+  <Vertex> 7 {
+    -1 1 -1
+    <UV> { 1 1 }
+  }
+  <Vertex> 8 {
+    -1 1 -1
+    <UV> { 0 1 }
+  }
+  <Vertex> 9 {
+    -1 -1 -1
+    <UV> { 0 0 }
+  }
+  <Vertex> 10 {
+    -1 -1 1
+    <UV> { 1 0 }
+  }
+  <Vertex> 11 {
+    -1 1 1
+    <UV> { 1 1 }
+  }
+  <Vertex> 12 {
+    1 1 1
+    <UV> { 0 1 }
+  }
+  <Vertex> 13 {
+    1 -1 1
+    <UV> { 0 0 }
+  }
+  <Vertex> 14 {
+    1 -1 -1
+    <UV> { 1 0 }
+  }
+  <Vertex> 15 {
+    1 1 -1
+    <UV> { 1 1 }
+  }
+  <Vertex> 16 {
+    -1 1 -1
+    <UV> { 0 1 }
+  }
+  <Vertex> 17 {
+    -1 1 1
+    <UV> { 0 0 }
+  }
+  <Vertex> 18 {
+    1 1 1
+    <UV> { 1 0 }
+  }
+  <Vertex> 19 {
+    1 1 -1
+    <UV> { 1 1 }
+  }
+  <Vertex> 20 {
+    -1 -1 1
+    <UV> { 0 1 }
+  }
+  <Vertex> 21 {
+    -1 -1 -1
+    <UV> { 0 0 }
+  }
+  <Vertex> 22 {
+    1 -1 -1
+    <UV> { 1 0 }
+  }
+  <Vertex> 23 {
+    1 -1 1
+    <UV> { 1 1 }
+  }
+}
+<Group> Mesh {
+  <Polygon> {
+    <Normal> { 0 0 1 }
+    <TRef> { color }
+    <VertexRef> { 0 1 3 <Ref> { Vertices } }
+  }
+  <Polygon> {
+    <Normal> { 0 0 1 }
+    <TRef> { color }
+    <VertexRef> { 3 1 2 <Ref> { Vertices } }
+  }
+  <Polygon> {
+    <Normal> { 0 0 -1 }
+    <TRef> { color }
+    <VertexRef> { 4 5 7 <Ref> { Vertices } }
+  }
+  <Polygon> {
+    <Normal> { 0 0 -1 }
+    <TRef> { color }
+    <VertexRef> { 7 5 6 <Ref> { Vertices } }
+  }
+  <Polygon> {
+    <Normal> { -1 0 0 }
+    <TRef> { color }
+    <VertexRef> { 8 9 11 <Ref> { Vertices } }
+  }
+  <Polygon> {
+    <Normal> { -1 0 0 }
+    <TRef> { color }
+    <VertexRef> { 11 9 10 <Ref> { Vertices } }
+  }
+  <Polygon> {
+    <Normal> { 1 0 0 }
+    <TRef> { color }
+    <VertexRef> { 12 13 15 <Ref> { Vertices } }
+  }
+  <Polygon> {
+    <Normal> { 1 0 0 }
+    <TRef> { color }
+    <VertexRef> { 15 13 14 <Ref> { Vertices } }
+  }
+  <Polygon> {
+    <Normal> { 0 1 0 }
+    <TRef> { color }
+    <VertexRef> { 16 17 19 <Ref> { Vertices } }
+  }
+  <Polygon> {
+    <Normal> { 0 1 0 }
+    <TRef> { color }
+    <VertexRef> { 19 17 18 <Ref> { Vertices } }
+  }
+  <Polygon> {
+    <Normal> { 0 -1 0 }
+    <TRef> { color }
+    <VertexRef> { 20 21 23 <Ref> { Vertices } }
+  }
+  <Polygon> {
+    <Normal> { 0 -1 0 }
+    <TRef> { color }
+    <VertexRef> { 23 21 22 <Ref> { Vertices } }
+  }
+}

@@ -1,0 +1,31 @@
+//Cg
+
+void vshader(float4 vtx_position : POSITION,
+             out float4 l_position : POSITION,
+             out float2 l_texcoord : TEXCOORD0,
+             uniform float4 texpad_color,
+             uniform float4x4 mat_modelproj)
+{
+    l_position = mul(mat_modelproj, vtx_position);
+    l_texcoord = (vtx_position.xz * texpad_color.xy) + texpad_color.xy;
+}
+
+#define DRAW 4
+#define DROP 2
+#define DRAW_INTENSITY 1.1
+#define DROP_INTENSITY 0.5
+
+void fshader(float2 l_texcoord : TEXCOORD0,
+             uniform sampler2D k_color : TEXUNIT0,
+             uniform sampler2D k_line : TEXUNIT1,
+             uniform float4 texpix_color,
+             uniform float4 texpad_color,
+             out float4 o_color : COLOR)
+{
+    float4 color = tex2D(k_color, l_texcoord);
+
+    float falloff = 1.1 - length(l_texcoord - texpad_color);
+    color *= pow(falloff, 4);    
+
+    o_color = color * (int(l_texcoord.y / texpix_color.y) % DRAW + DROP < DRAW ? DRAW_INTENSITY : DROP_INTENSITY);
+}

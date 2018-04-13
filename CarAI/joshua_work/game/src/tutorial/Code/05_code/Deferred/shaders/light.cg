@@ -1,0 +1,43 @@
+//Cg
+
+void vshader(float4 vtx_position : POSITION,
+             out float4 l_position : POSITION,
+             out float4 l_screenpos : TEXCOORD0,
+             uniform float4x4 mat_modelproj)
+{
+    l_position = mul(mat_modelproj, vtx_position);
+    l_screenpos = l_position;
+}
+
+void fshader(float4 l_screenpos : TEXCOORD0,
+             uniform sampler2D k_albedo : TEXUNIT0,
+             uniform sampler2D k_depth : TEXUNIT1,
+             uniform sampler2D k_normal : TEXUNIT2,
+             uniform float4 texpad_albedo,
+             uniform float4 attr_color,
+             uniform float4 vspos_model,
+             uniform float4x4 vstrans_clip,
+             uniform float4 row0_model_to_view,
+             out float4 o_color : COLOR)
+{
+    l_screenpos.xy /= l_screenpos.w;
+    float2 texcoords = float2(l_screenpos.xy) * texpad_albedo.xy + texpad_albedo.xy;
+
+    float4 albedo = tex2D(k_albedo, texcoords);
+    float4 normal = tex2D(k_normal, texcoords);
+    float depth = tex2D(k_depth, texcoords);
+
+    float4 vspos_scene;
+    vspos_scene.xy = l_screenpos.xy;
+    vspos_scene.z = depth;
+    vspos_scene.w = 1;
+    vspos_scene = mul(vstrans_clip, vspos_scene);
+    vspos_scene /= vspos_scene.w * 2;
+
+    float3 vec = float3(vspos_model) - vspos_scene;
+    float len = length(vec);
+    float3 dir = vec / len;
+    float atten = saturate(1.0 - (len / row0_model_to_view.x));
+    float intensity = pow(atten, 2) * dot(dir, float3(normal));
+    o_color = float4(albedo.xyz * attr_color.xyz * intensity, 1);
+}

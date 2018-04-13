@@ -1,0 +1,23 @@
+//Cg
+
+void vshader(float4 vtx_position : POSITION,
+             out float4 l_position : POSITION,
+             out float4 l_screenpos : TEXCOORD0,
+             uniform float4x4 mat_modelproj)
+{
+    l_position = mul(mat_modelproj, vtx_position);
+    l_screenpos = l_position;
+}
+
+void fshader(float4 l_screenpos : TEXCOORD0,
+             uniform sampler2D k_albedo : TEXUNIT0,
+             uniform float4 texpad_albedo,
+             uniform float4 attr_color,
+             out float4 o_color : COLOR)
+{
+    l_screenpos.xy /= l_screenpos.w;
+    float2 texcoords = float2(l_screenpos.xy) * texpad_albedo.xy + texpad_albedo.xy;
+
+    float4 albedo = tex2D(k_albedo, texcoords);
+    o_color = albedo * attr_color;
+}

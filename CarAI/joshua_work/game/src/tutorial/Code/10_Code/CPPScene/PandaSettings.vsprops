@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="PandaSettings"
+	>
+	<Tool
+		Name="VCCLCompilerTool"
+		AdditionalIncludeDirectories="&quot;C:\Panda3D-1.7.0\python\include&quot;;&quot;C:\Panda3D-1.7.0\include&quot;"
+	/>
+	<Tool
+		Name="VCLinkerTool"
+		AdditionalDependencies="libp3framework.lib libpanda.lib libpandafx.lib libpandaexpress.lib libp3dtool.lib libp3dtoolconfig.lib libp3pystub.lib libp3direct.lib"
+		AdditionalLibraryDirectories="&quot;C:\Panda3D-1.7.0\python\libs&quot;;&quot;C:\Panda3D-1.7.0\lib&quot;"
+	/>
+</VisualStudioPropertySheet>
