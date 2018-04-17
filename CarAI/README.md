@@ -37,7 +37,10 @@ Background:
 Using python with 3D game engine:
 * Unreal Engine: https://github.com/20tab/UnrealEnginePython
 * Unity: https://github.com/exodrifter/unity-python https://github.com/Unity-Technologies/ml-agents
-* Panda3d: https://www.panda3d.org/reference/python https://www.panda3d.org/manual/index.php/Bullet_Vehicles https://github.com/parthnaik92/Car_Racing_Game/blob/master/tutorial.py https://www.panda3d.org/manual/index.php/Cheat_Sheets 
+* Panda3d: https://www.panda3d.org/reference/python https://www.panda3d.org/manual/index.php/Bullet_Vehicles https://github.com/parthnaik92/Car_Racing_Game/blob/master/tutorial.py https://www.panda3d.org/manual/index.php/Cheat_Sheets https://github.com/fireclawthefox/panda3d-tutorial
+https://github.com/tobspr/RenderPipeline
+https://github.com/Cg-boy/open-driving-3d https://moguri.github.io/panda-sphinx/getting-started-on-osx.html
+https://paulobarbeiro.com.br/tag/panda3d-en/
 * Blender python: https://docs.blender.org/api/current/
 * Other AI Projects: https://github.com/commaai/research https://comma.ai
 
