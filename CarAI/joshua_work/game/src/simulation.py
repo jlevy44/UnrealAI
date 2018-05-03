@@ -10,12 +10,12 @@ from direct.showbase.InputStateGlobal import inputState
 
 from panda3d.core import AmbientLight
 from panda3d.core import DirectionalLight
-from panda3d.core import Vec3
+from panda3d.core import Vec3, CollideMask
 from panda3d.core import Vec4
 from panda3d.core import Point3
 from panda3d.core import TransformState
 from panda3d.core import BitMask32
-from panda3d.core import CollisionRay, CollisionNode
+from panda3d.core import CollisionRay, CollisionNode, CollisionTraverser, CollisionHandlerQueue
 
 from panda3d.bullet import BulletWorld
 from panda3d.bullet import BulletPlaneShape
@@ -127,7 +127,7 @@ class Game(DirectObject):
     self.vehicle.setBrake(brakeForce, 3);
 
   def raycast(self):
-      pFrom = render.getRelativePoint(self.yugoNP,Point3(0,0,0))#Point3(0,0,0)
+      """pFrom = render.getRelativePoint(self.yugoNP,Point3(0,0,0))#Point3(0,0,0)
       pFrom -= Point3(0,0,pFrom[2])
       pRel = render.getRelativePoint(base.cam,self.yugoNP.getPos())  # FIXME THIS IS IT!! get rid of z component
       pRel -= Point3(0,0,pRel[2])
@@ -141,7 +141,7 @@ class Game(DirectObject):
       #print(dir(self.yugoNP))
       #print(result.getHitPos())
       return tuple([res.getHitPos().length() for res in result])
-      #queue = CollisionHandlerQueue()
+      """#queue = CollisionHandlerQueue()
       #traverser.addCollider(fromObject, queue)
       #traverser.traverse(render)
       #queue.sortEntries()
@@ -150,7 +150,10 @@ class Game(DirectObject):
       #print(result.getHitPos())
       #if result.getNode() != None:
       #print(self.yugoNP.getPos(result.getNode()))
-
+      self.cTrav.traverse(render)
+      entries = list(self.colHandler.getEntries())
+      entries.sort(key=lambda y: y.getSurfacePoint(render).getY())
+      print(entries)
 
   def update(self, task):
     dt = globalClock.getDt()
@@ -158,7 +161,7 @@ class Game(DirectObject):
     self.processInput(dt)
     self.world.doPhysics(dt, 10, 0.008)
 
-    print(self.raycast())
+    #print(self.raycast())
     #base.camera.setPos(0,-40,10)
     #print self.vehicle.getWheel(0).getRaycastInfo().isInContact()
     #print self.vehicle.getWheel(0).getRaycastInfo().getContactPointWs()
@@ -206,14 +209,28 @@ class Game(DirectObject):
 
     #np.node().setCcdSweptSphereRadius(1.0)
     #np.node().setCcdMotionThreshold(1e-7)
-
+    self.cTrav = CollisionTraverser()
     # Vehicle
     self.vehicle = BulletVehicle(self.world, np.node())
     self.vehicle.setCoordinateSystem(ZUp)
-    self.world.attachVehicle(self.vehicle)
-
     self.yugoNP = loader.loadModel('models/yugo/yugo.egg')
     self.yugoNP.reparentTo(np)
+
+    self.ray = CollisionRay()
+    self.ray.setOrigin(0,1,0.5)
+    self.ray.setDirection(0,1,0)
+    self.ray_col = CollisionNode('ray')
+    self.ray_col.addSolid(self.ray)
+    self.ray_col.setFromCollideMask(CollideMask.bit(0))
+    #self.ray_col.setIntoCollideMask(CollideMask.allOff())
+    self.ray_col_np = self.yugoNP.attachNewNode(self.ray_col)
+    self.colHandler = CollisionHandlerQueue()
+    self.cTrav.addCollider(self.ray_col_np,self.colHandler)
+    self.ray_col_np.show()
+    self.cTrav.showCollisions(render)
+    self.world.attachVehicle(self.vehicle)
+
+
 
     # FIXME
     base.camera.reparentTo(self.yugoNP)
@@ -245,7 +262,7 @@ class Game(DirectObject):
 
     # Box
     shape = BulletBoxShape(Vec3(0.5, 0.5, 0.5))
-
+    # https://discourse.panda3d.org/t/wall-collision-help/23606
     np = self.worldNP.attachNewNode(BulletRigidBodyNode('Box'))
     np.node().setMass(1.0)
     np.node().addShape(shape)
