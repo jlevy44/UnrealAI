@@ -154,6 +154,8 @@ class Game(DirectObject):
       self.cTrav.traverse(render)
       entries = list(self.colHandler.getEntries())
       entries.sort(key=lambda y: y.getSurfacePoint(render).getY())
+      for entry in entries:
+          print(entry.getFromNodePath().getName())
       return entries
 
   def update(self, task):
@@ -163,9 +165,12 @@ class Game(DirectObject):
     self.world.doPhysics(dt, 10, 0.008)
 
     result = self.raycast()
-    if result and len(result) > 1:
+    if result:# and len(result) > 1:
+        for r in result:
+            if r.getIntoNodePath().getName() == 'Box' and r.getFromNodePath().getName() in ['ray%d'%i for i in range(-1,2)]:
+                print(np.linalg.norm(list(r.getSurfacePoint(r.getFromNodePath()))[:-1]))
         #print(dir(result[1]))
-        print(np.linalg.norm(list(result[1].getSurfacePoint(result[1].getFromNodePath()))[:-1]))
+        #print(np.linalg.norm(list(result[1].getSurfacePoint(result[1].getFromNodePath()))[:-1]))
     #base.camera.setPos(0,-40,10)
     #print self.vehicle.getWheel(0).getRaycastInfo().isInContact()
     #print self.vehicle.getWheel(0).getRaycastInfo().getContactPointWs()
