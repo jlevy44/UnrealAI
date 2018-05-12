@@ -2,7 +2,7 @@
 #from pandac.PandaModules import loadPrcFileData
 #loadPrcFileData('', 'load-display tinydisplay')
 
-import sys
+import sys, numpy as np
 import direct.directbase.DirectStart
 
 from direct.showbase.DirectObject import DirectObject
@@ -150,10 +150,11 @@ class Game(DirectObject):
       #print(result.getHitPos())
       #if result.getNode() != None:
       #print(self.yugoNP.getPos(result.getNode()))
+      #print(self.cTrav)
       self.cTrav.traverse(render)
       entries = list(self.colHandler.getEntries())
       entries.sort(key=lambda y: y.getSurfacePoint(render).getY())
-      print(entries)
+      return entries
 
   def update(self, task):
     dt = globalClock.getDt()
@@ -161,7 +162,10 @@ class Game(DirectObject):
     self.processInput(dt)
     self.world.doPhysics(dt, 10, 0.008)
 
-    #print(self.raycast())
+    result = self.raycast()
+    if result and len(result) > 1:
+        #print(dir(result[1]))
+        print(np.linalg.norm(list(result[1].getSurfacePoint(result[1].getFromNodePath()))[:-1]))
     #base.camera.setPos(0,-40,10)
     #print self.vehicle.getWheel(0).getRaycastInfo().isInContact()
     #print self.vehicle.getWheel(0).getRaycastInfo().getContactPointWs()
@@ -215,21 +219,21 @@ class Game(DirectObject):
     self.vehicle.setCoordinateSystem(ZUp)
     self.yugoNP = loader.loadModel('models/yugo/yugo.egg')
     self.yugoNP.reparentTo(np)
-
+    self.colHandler = CollisionHandlerQueue()
+    self.ray_col_np = {}
     for ray_dir in range(-1,2): # populate collision rays
         self.ray = CollisionRay()
-        self.ray.setOrigin(ray_dir,1,0.5)
+        self.ray.setOrigin(ray_dir,0.5,0.5)
         self.ray.setDirection(ray_dir,1,0)
-        self.ray_col = CollisionNode('ray')
+        self.ray_col = CollisionNode('ray%d'%(ray_dir+1))
         self.ray_col.addSolid(self.ray)
-        self.ray_col.setFromCollideMask(CollideMask.bit(0))
+        self.ray_col.setFromCollideMask(BitMask32.allOn())#(0x0f))#CollideMask.bit(0)
         #self.ray_col.setIntoCollideMask(CollideMask.allOff())
-        self.ray_col_np = self.yugoNP.attachNewNode(self.ray_col)
-        self.colHandler = CollisionHandlerQueue()
-        self.cTrav.addCollider(self.ray_col_np,self.colHandler)
-        self.ray_col_np.show()
-    self.cTrav.showCollisions(render)
+        self.ray_col_np['ray%d'%(ray_dir+1)] = self.yugoNP.attachNewNode(self.ray_col)
+        self.cTrav.addCollider(self.ray_col_np['ray%d'%(ray_dir+1)],self.colHandler)
+        self.ray_col_np['ray%d'%(ray_dir+1)].show()
     self.world.attachVehicle(self.vehicle)
+    self.cTrav.showCollisions(render)
 
 
 
@@ -268,12 +272,17 @@ class Game(DirectObject):
     np.node().setMass(1.0)
     np.node().addShape(shape)
     np.setPos(0, 8, 4)
-    np.setCollideMask(BitMask32(0x0f))
+    np.setCollideMask(BitMask32.allOn())#(0x0f))
 
     self.world.attachRigidBody(np.node())
     self.boxNP = np
+    #self.colHandler2 = CollisionHandlerQueue()
+
+
     visualNP = loader.loadModel('models/box.egg')
     visualNP.reparentTo(self.boxNP)
+    #self.cTrav.addCollider(self.boxNP,self.colHandler)
+
     """
     aNode = CollisionNode("TheRay")
 
@@ -333,4 +342,4 @@ class Game(DirectObject):
     wheel.setRollInfluence(0.1)
 
 game = Game()
-run()
+base.run()
