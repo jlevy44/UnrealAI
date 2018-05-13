@@ -24,10 +24,53 @@ from panda3d.bullet import BulletRigidBodyNode
 from panda3d.bullet import BulletDebugNode
 from panda3d.bullet import BulletVehicle
 from panda3d.bullet import ZUp
+from functools import reduce
+
+class NeuralNetGA:
+
+    def __init__(self,shape, activation):
+        self.shape = shape
+        self.hidden_layers_size = self.shape[1:-1]
+        self.input_size = self.shape[0]
+        self.output_size = self.shape[-1]
+        self.activation_functions = {'tanh': lambda x: np.tanh(x/4.)*10.}
+        self.activation = self.activation_functions[activation]
+
+        self.weights_dimensions = [(self.shape[i],self.shape[i+1]) for i in range(len(self.shape)-1)]
+        #print(self.weights_dimensions)
+        self.weights_indices = np.cumsum([dimensions[0]*dimensions[1] for dimensions in self.weights_dimensions])
+        #print(self.weights_indices)
+        # F2(W2*F(Wx))
+
+    def predict(self,X):
+        #print(X,self.weights)
+        #print([X] + self.weights)
+        self.y = reduce(lambda x,y: np.vectorize(self.activation)(np.dot(x,y)), [X] + self.weights)
+        print(X,self.y)
+        return self.y
+
+    def assign_weights(self, weights_dict):
+        #print(enumerate(np.split(np.array(weights_dict.values()),self.weights_indices[:-1]).tolist()))
+        #print(np.array(list(weights_dict.values())))
+        #print(np.split(np.array(list(weights_dict.values())),self.weights_indices))
+        self.weights = [np.reshape(weights,self.weights_dimensions[i]) for i, weights in enumerate(np.split(np.array(list(weights_dict.values())),self.weights_indices[:-1])) if list(weights)]#.tolist()
+        #print(self.weights)
+
+    def evaluate_task(self, **kargs):
+        self.assign_weights(kargs)
+        self.model = lambda X: self.predict(X)
+        self.task_output = self.task(self.model)
+        return self.task_output
+
+    def fit(self, task):
+        self.task = task
+        best_params, best_score, score_results, hist, log = maximize(evaluate_task,{'w%d'%i:np.linspace(-100,100,1000) for i in range(self.weights_indices[-1])},{})
+
 
 class Game(DirectObject):
 
-  def __init__(self):
+  def __init__(self, model):
+    self.model = model
     base.setBackgroundColor(0.1, 0.1, 0.8, 1)
     base.setFrameRateMeter(True)
 
@@ -96,10 +139,29 @@ class Game(DirectObject):
 
   # ____TASK___
 
+  def calculate_moves(self):
+      self.y = self.model.predict(self.x)
+      self.moves = self.y > 0 # 0.5
+
   def processInput(self, dt):
     engineForce = 0.0
     brakeForce = 0.0
+    if self.y[0]:#inputState.isSet('forward'):
+      engineForce = 1000.0
+      brakeForce = 0.0
 
+    if not self.y[0]:#inputState.isSet('reverse'):
+      engineForce = 0.0
+      brakeForce = 100.0
+
+    if self.y[1]:#inputState.isSet('turnLeft'):
+      self.steering += dt * self.steeringIncrement
+      self.steering = min(self.steering, self.steeringClamp)
+
+    if not self.y[1]:#inputState.isSet('turnRight'):
+      self.steering -= dt * self.steeringIncrement
+      self.steering = max(self.steering, -self.steeringClamp)
+    """
     if inputState.isSet('forward'):
       engineForce = 1000.0
       brakeForce = 0.0
@@ -115,7 +177,7 @@ class Game(DirectObject):
     if inputState.isSet('turnRight'):
       self.steering -= dt * self.steeringIncrement
       self.steering = max(self.steering, -self.steeringClamp)
-
+    """
     # Apply steering to front wheels
     self.vehicle.setSteeringValue(self.steering, 0);
     self.vehicle.setSteeringValue(self.steering, 1);
@@ -154,21 +216,27 @@ class Game(DirectObject):
       self.cTrav.traverse(render)
       entries = list(self.colHandler.getEntries())
       entries.sort(key=lambda y: y.getSurfacePoint(render).getY())
-      for entry in entries:
-          print(entry.getFromNodePath().getName())
-      return entries
+      #for entry in entries:      print(entry.getFromNodePath().getName())
+      if entries:# and len(result) > 1:
+          for r in entries:
+              if r.getIntoNodePath().getName() == 'Box' and r.getFromNodePath().getName() in ['ray%d'%i for i in range(3)]:
+                  self.ray_col_vec_dict[r.getFromNodePath().getName()].append(np.linalg.norm(list(r.getSurfacePoint(r.getFromNodePath()))[:-1]))
+      self.ray_col_vec_dict = {k: (min(self.ray_col_vec_dict[k]) if len(self.ray_col_vec_dict[k]) >= 1 else 10000) for k in self.ray_col_vec_dict}
+      self.x = np.array(list(self.ray_col_vec_dict.values()))
+      #return entries
 
   def update(self, task):
     dt = globalClock.getDt()
 
+    self.raycast()
+    self.calculate_moves()
+    self.ray_col_vec_dict = {k:[] for k in self.ray_col_vec_dict}
     self.processInput(dt)
     self.world.doPhysics(dt, 10, 0.008)
 
-    result = self.raycast()
-    if result:# and len(result) > 1:
-        for r in result:
-            if r.getIntoNodePath().getName() == 'Box' and r.getFromNodePath().getName() in ['ray%d'%i for i in range(-1,2)]:
-                print(np.linalg.norm(list(r.getSurfacePoint(r.getFromNodePath()))[:-1]))
+
+
+
         #print(dir(result[1]))
         #print(np.linalg.norm(list(result[1].getSurfacePoint(result[1].getFromNodePath()))[:-1]))
     #base.camera.setPos(0,-40,10)
@@ -226,6 +294,7 @@ class Game(DirectObject):
     self.yugoNP.reparentTo(np)
     self.colHandler = CollisionHandlerQueue()
     self.ray_col_np = {}
+    self.ray_col_vec_dict = {}
     for ray_dir in range(-1,2): # populate collision rays
         self.ray = CollisionRay()
         self.ray.setOrigin(ray_dir,0.5,0.5)
@@ -237,6 +306,7 @@ class Game(DirectObject):
         self.ray_col_np['ray%d'%(ray_dir+1)] = self.yugoNP.attachNewNode(self.ray_col)
         self.cTrav.addCollider(self.ray_col_np['ray%d'%(ray_dir+1)],self.colHandler)
         self.ray_col_np['ray%d'%(ray_dir+1)].show()
+        self.ray_col_vec_dict['ray%d'%(ray_dir+1)] = []
     self.world.attachVehicle(self.vehicle)
     self.cTrav.showCollisions(render)
 
@@ -271,21 +341,22 @@ class Game(DirectObject):
     self.steeringIncrement = 120.0 # degree per second
 
     # Box
-    shape = BulletBoxShape(Vec3(0.5, 0.5, 0.5))
-    # https://discourse.panda3d.org/t/wall-collision-help/23606
-    np = self.worldNP.attachNewNode(BulletRigidBodyNode('Box'))
-    np.node().setMass(1.0)
-    np.node().addShape(shape)
-    np.setPos(0, 8, 4)
-    np.setCollideMask(BitMask32.allOn())#(0x0f))
+    for i,j in [(0,8),(-3,5),(6,-5),(8,3),(-4,-4)]:
+        shape = BulletBoxShape(Vec3(0.5, 0.5, 0.5))
+        # https://discourse.panda3d.org/t/wall-collision-help/23606
+        np = self.worldNP.attachNewNode(BulletRigidBodyNode('Box'))
+        np.node().setMass(1.0)
+        np.node().addShape(shape)
+        np.setPos(i, j, 2)
+        np.setCollideMask(BitMask32.allOn())#(0x0f))
 
-    self.world.attachRigidBody(np.node())
-    self.boxNP = np
-    #self.colHandler2 = CollisionHandlerQueue()
+        self.world.attachRigidBody(np.node())
+        self.boxNP = np
+        #self.colHandler2 = CollisionHandlerQueue()
 
 
-    visualNP = loader.loadModel('models/box.egg')
-    visualNP.reparentTo(self.boxNP)
+        visualNP = loader.loadModel('models/box.egg')
+        visualNP.reparentTo(self.boxNP)
     #self.cTrav.addCollider(self.boxNP,self.colHandler)
 
     """
@@ -346,5 +417,7 @@ class Game(DirectObject):
     wheel.setFrictionSlip(100.0);
     wheel.setRollInfluence(0.1)
 
-game = Game()
+model = NeuralNetGA([3,4,4,2],'tanh')
+model.assign_weights({'w%d'%i:np.random.rand()-0.5 for i in range(36)})
+game = Game(model)
 base.run()
