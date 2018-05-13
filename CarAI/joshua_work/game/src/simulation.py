@@ -14,7 +14,7 @@ from panda3d.core import Vec3, CollideMask
 from panda3d.core import Vec4
 from panda3d.core import Point3
 from panda3d.core import TransformState
-from panda3d.core import BitMask32
+from panda3d.core import BitMask32, GeoMipTerrain
 from panda3d.core import CollisionRay, CollisionNode, CollisionTraverser, CollisionHandlerQueue
 
 from panda3d.bullet import BulletWorld
@@ -261,6 +261,11 @@ class Game(DirectObject):
     self.world = BulletWorld()
     self.world.setGravity(Vec3(0, 0, -9.81))
     self.world.setDebugNode(self.debugNP.node())
+
+    terrain = GeoMipTerrain("mySimpleTerrain")
+    terrain.setHeightfield("./models/heightfield_1.png")
+    terrain.getRoot().reparentTo(render)
+    terrain.generate()
 
     # Plane
     shape = BulletPlaneShape(Vec3(0, 0, 1), 0)
