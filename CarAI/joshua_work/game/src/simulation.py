@@ -2,7 +2,7 @@
 #from pandac.PandaModules import loadPrcFileData
 #loadPrcFileData('', 'load-display tinydisplay')
 
-import sys, numpy as np
+import sys, numpy
 import direct.directbase.DirectStart
 
 from direct.showbase.DirectObject import DirectObject
@@ -33,27 +33,27 @@ class NeuralNetGA:
         self.hidden_layers_size = self.shape[1:-1]
         self.input_size = self.shape[0]
         self.output_size = self.shape[-1]
-        self.activation_functions = {'tanh': lambda x: np.tanh(x/4.)*10.}
+        self.activation_functions = {'tanh': lambda x: numpy.tanh(x/4.)*10.}
         self.activation = self.activation_functions[activation]
 
         self.weights_dimensions = [(self.shape[i],self.shape[i+1]) for i in range(len(self.shape)-1)]
         #print(self.weights_dimensions)
-        self.weights_indices = np.cumsum([dimensions[0]*dimensions[1] for dimensions in self.weights_dimensions])
+        self.weights_indices = numpy.cumsum([dimensions[0]*dimensions[1] for dimensions in self.weights_dimensions])
         #print(self.weights_indices)
         # F2(W2*F(Wx))
 
     def predict(self,X):
         #print(X,self.weights)
         #print([X] + self.weights)
-        self.y = reduce(lambda x,y: np.vectorize(self.activation)(np.dot(x,y)), [X] + self.weights)
+        self.y = reduce(lambda x,y: numpy.vectorize(self.activation)(numpy.dot(x,y)), [X] + self.weights)
         print(X,self.y)
         return self.y
 
     def assign_weights(self, weights_dict):
-        #print(enumerate(np.split(np.array(weights_dict.values()),self.weights_indices[:-1]).tolist()))
-        #print(np.array(list(weights_dict.values())))
-        #print(np.split(np.array(list(weights_dict.values())),self.weights_indices))
-        self.weights = [np.reshape(weights,self.weights_dimensions[i]) for i, weights in enumerate(np.split(np.array(list(weights_dict.values())),self.weights_indices[:-1])) if list(weights)]#.tolist()
+        #print(enumerate(numpy.split(numpy.array(weights_dict.values()),self.weights_indices[:-1]).tolist()))
+        #print(numpy.array(list(weights_dict.values())))
+        #print(numpy.split(numpy.array(list(weights_dict.values())),self.weights_indices))
+        self.weights = [numpy.reshape(weights,self.weights_dimensions[i]) for i, weights in enumerate(numpy.split(numpy.array(list(weights_dict.values())),self.weights_indices[:-1])) if list(weights)]#.tolist()
         #print(self.weights)
 
     def evaluate_task(self, **kargs):
@@ -64,7 +64,7 @@ class NeuralNetGA:
 
     def fit(self, task):
         self.task = task
-        best_params, best_score, score_results, hist, log = maximize(evaluate_task,{'w%d'%i:np.linspace(-100,100,1000) for i in range(self.weights_indices[-1])},{})
+        best_params, best_score, score_results, hist, log = maximize(evaluate_task,{'w%d'%i:numpy.linspace(-100,100,1000) for i in range(self.weights_indices[-1])},{})
 
 
 class Game(DirectObject):
@@ -146,19 +146,19 @@ class Game(DirectObject):
   def processInput(self, dt):
     engineForce = 0.0
     brakeForce = 0.0
-    if self.y[0]:#inputState.isSet('forward'):
+    if self.moves[0]:#inputState.isSet('forward'):
       engineForce = 1000.0
       brakeForce = 0.0
 
-    if not self.y[0]:#inputState.isSet('reverse'):
+    if not self.moves[0]:#inputState.isSet('reverse'):
       engineForce = 0.0
       brakeForce = 100.0
 
-    if self.y[1]:#inputState.isSet('turnLeft'):
+    if self.moves[1]:#inputState.isSet('turnLeft'):
       self.steering += dt * self.steeringIncrement
       self.steering = min(self.steering, self.steeringClamp)
 
-    if not self.y[1]:#inputState.isSet('turnRight'):
+    if not self.moves[1]:#inputState.isSet('turnRight'):
       self.steering -= dt * self.steeringIncrement
       self.steering = max(self.steering, -self.steeringClamp)
     """
@@ -220,9 +220,9 @@ class Game(DirectObject):
       if entries:# and len(result) > 1:
           for r in entries:
               if r.getIntoNodePath().getName() == 'Box' and r.getFromNodePath().getName() in ['ray%d'%i for i in range(3)]:
-                  self.ray_col_vec_dict[r.getFromNodePath().getName()].append(np.linalg.norm(list(r.getSurfacePoint(r.getFromNodePath()))[:-1]))
+                  self.ray_col_vec_dict[r.getFromNodePath().getName()].append(numpy.linalg.norm(list(r.getSurfacePoint(r.getFromNodePath()))[:-1]))
       self.ray_col_vec_dict = {k: (min(self.ray_col_vec_dict[k]) if len(self.ray_col_vec_dict[k]) >= 1 else 10000) for k in self.ray_col_vec_dict}
-      self.x = np.array(list(self.ray_col_vec_dict.values()))
+      self.x = numpy.array(list(self.ray_col_vec_dict.values()))
       #return entries
 
   def update(self, task):
@@ -238,7 +238,7 @@ class Game(DirectObject):
 
 
         #print(dir(result[1]))
-        #print(np.linalg.norm(list(result[1].getSurfacePoint(result[1].getFromNodePath()))[:-1]))
+        #print(numpy.linalg.norm(list(result[1].getSurfacePoint(result[1].getFromNodePath()))[:-1]))
     #base.camera.setPos(0,-40,10)
     #print self.vehicle.getWheel(0).getRaycastInfo().isInContact()
     #print self.vehicle.getWheel(0).getRaycastInfo().getContactPointWs()
@@ -263,8 +263,8 @@ class Game(DirectObject):
     self.world.setDebugNode(self.debugNP.node())
 
     terrain = GeoMipTerrain("mySimpleTerrain")
-    terrain.setHeightfield("./models/heightfield_1.png")
-    terrain.getRoot().reparentTo(render)
+    terrain.setHeightfield("./models/heightfield_2.png")
+    terrain.getRoot().reparentTo(self.worldNP)#render)
     terrain.generate()
 
     # Plane
@@ -423,6 +423,6 @@ class Game(DirectObject):
     wheel.setRollInfluence(0.1)
 
 model = NeuralNetGA([3,4,4,2],'tanh')
-model.assign_weights({'w%d'%i:np.random.rand()-0.5 for i in range(36)})
+model.assign_weights({'w%d'%i:numpy.random.rand()-0.5 for i in range(36)})
 game = Game(model)
 base.run()
