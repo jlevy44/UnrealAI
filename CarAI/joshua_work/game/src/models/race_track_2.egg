@@ -1,0 +1,15 @@
+<CoordinateSystem> { Y-Up-Left }
+
+<Comment> {
+  "x2egg /Users/JoshuaLevy/Documents/Repositories/Github/UnrealAI/CarAI/joshua_work/game/src/models/race_track.blend.x /Users/JoshuaLevy/Documents/Repositories/Github/UnrealAI/CarAI/joshua_work/game/src/models/race_track_2.egg"
+}
+<Group> Root {
+  <Transform> {
+    <Matrix4> {
+      1 0 0 0
+      0 0 1 0
+      0 1 0 0
+      0 0 0 1
+    }
+  }
+}

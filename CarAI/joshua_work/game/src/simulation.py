@@ -226,6 +226,7 @@ class Game(DirectObject):
       #return entries
 
   def update(self, task):
+
     dt = globalClock.getDt()
 
     self.raycast()
@@ -262,10 +263,10 @@ class Game(DirectObject):
     self.world.setGravity(Vec3(0, 0, -9.81))
     self.world.setDebugNode(self.debugNP.node())
 
-    terrain = GeoMipTerrain("mySimpleTerrain")
-    terrain.setHeightfield("./models/heightfield_2.png")
-    terrain.getRoot().reparentTo(self.worldNP)#render)
-    terrain.generate()
+    #terrain = GeoMipTerrain("mySimpleTerrain")
+    #terrain.setHeightfield("./models/heightfield_2.png")
+    #terrain.getRoot().reparentTo(self.worldNP)#render)
+    #terrain.generate()
 
     # Plane
     shape = BulletPlaneShape(Vec3(0, 0, 1), 0)
@@ -276,6 +277,21 @@ class Game(DirectObject):
     np.setCollideMask(BitMask32.allOn())
 
     self.world.attachRigidBody(np.node())
+
+    np = self.worldNP.attachNewNode(BulletRigidBodyNode('Track'))
+    np.node().setMass(5000.0)
+    np.setPos(3, 0, 10)
+    np.setCollideMask(BitMask32.allOn())#(0x0f))
+    #self.track = BulletVehicle(self.world, np.node())
+    #self.track.setCoordinateSystem(ZUp)
+    self.track_np = loader.loadModel('models/race_track.egg')
+    self.track_np.setScale(100)
+    self.track_np.reparentTo(np)
+
+    self.track_np.setCollideMask(BitMask32.allOn())
+    self.world.attachRigidBody(np.node())
+    self.track_np = np
+    #self.track_np.show()
 
     # Chassis
     shape = BulletBoxShape(Vec3(0.6, 1.4, 0.5))
