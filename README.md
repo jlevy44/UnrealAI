@@ -21,6 +21,7 @@ Without further-a-do, here are some initial projects that I'm interested in work
 * Studying how anarchic organizational patterns influence social networks, and consequently the flow of ideas that can influence productivity (maybe involvement of Social Physics)
   * Concentration on idea flow (exploration and engagement) and social learning (ideas to habits, accelerated by social pressure).
 * MNIST Tests with GAs and NN; high complexity models but trying to avoid overfitting
+* Game of Life: Let's take inspiration from games such as spore, and civilization, and build a game which that has agents that procreate and live life. We can include omnivores, carnivores, herbivores, birds, fish, and land creatures.
 * etc.
 
 These are just some ideas. I'll add more, and we can also start a blog to document our progress and show off our knowledge and new skills.
