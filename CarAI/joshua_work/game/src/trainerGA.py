@@ -6,11 +6,11 @@ import os, pickle, numpy as np
 
 
 architecture, activation = [3,4,5,4,3], 'tanh'
-population_size=30
-generations_number=50
-gene_mutation_prob=0.35
-gene_crossover_prob = 0.35
-tournament_size = 4
+population_size=100
+generations_number=20
+gene_mutation_prob=0.40
+gene_crossover_prob = 0.25
+tournament_size = 3
 rand_init = False
 n_possible_weight_values = 1000
 weights_scaling_factor = 10.
