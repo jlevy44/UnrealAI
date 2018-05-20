@@ -42,21 +42,30 @@ class NeuralNetGA:
         self.weights_dimensions = [(self.shape[i],self.shape[i+1]) for i in range(len(self.shape)-1)]
         #print(self.weights_dimensions)
         self.weights_indices = numpy.cumsum([dimensions[0]*dimensions[1] for dimensions in self.weights_dimensions])
+        self.bias_indices = numpy.cumsum(self.shape[1:])
         #print(self.weights_indices)
         # F2(W2*F(Wx))
 
     def predict(self,X):
         #print(X,self.weights)
         #print([X] + self.weights)
-        self.y = reduce(lambda x,y: numpy.vectorize(self.activation)(numpy.dot(x,y)), [X] + self.weights)
+        #self.y = reduce(lambda x,y: numpy.vectorize(self.activation)(numpy.dot(x,y)), [X] + self.weights)
+        current_layer = X
+        #print(len(self.weights),len(self.bias))
+        for i in range(len(self.weights)):
+            #print(i)
+            current_layer = self.activation(numpy.dot(current_layer,self.weights[i]) + self.bias[i])
+        self.y = current_layer
         #print(X,self.y)
         return self.y
 
-    def assign_weights(self, weights_dict):
+    def assign_weights(self, weights_dict, bias_dict):
         #print(enumerate(numpy.split(numpy.array(weights_dict.values()),self.weights_indices[:-1]).tolist()))
         #print(numpy.array(list(weights_dict.values())))
         #print(numpy.split(numpy.array(list(weights_dict.values())),self.weights_indices))
+        #print(weights_dict,bias_dict)
         self.weights = [numpy.reshape(weights,self.weights_dimensions[i]) for i, weights in enumerate(numpy.split(numpy.array(list(weights_dict.values())),self.weights_indices[:-1])) if list(weights)]#.tolist()
+        self.bias = numpy.split(numpy.array(list(bias_dict.values())),self.bias_indices[:-1])
         #print(self.weights)
 
     def evaluate_task(self, **kargs):
@@ -533,12 +542,12 @@ class Game(DirectObject):
 #while True:
 # GA model
 try:
-    weights, architecture, activation = pickle.load(open('weights.p','rb'))
+    weights, bias, architecture, activation = pickle.load(open('weights.p','rb'))
     print("MODEL LOADED", weights)
 except:
-    weights, architecture, activation =  ({'w%d'%i:numpy.random.rand()-0.5 for i in range(36)},[3,4,4,2],'tanh')
+    weights, bias, architecture, activation =  ({'w%d'%i:numpy.random.rand()-0.5 for i in range(36)},{'b%d'%i:numpy.random.rand()-0.5 for i in range(10)},[3,4,4,2],'tanh')
 
 model = NeuralNetGA(architecture,activation)
-model.assign_weights(weights)
+model.assign_weights(weights, bias)
 game = Game(model)
 base.run()

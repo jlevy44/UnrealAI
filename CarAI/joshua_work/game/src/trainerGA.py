@@ -17,16 +17,19 @@ scaling_factor = 10.
 if architecture[0] < 2:
     architecture[0] = 2
 n_weights = sum([architecture[i]*architecture[i+1] for i in range(len(architecture)-1)])
+n_bias = sum(architecture[1:])
 X = []
 y = []
 #count = 0
 #plt.figure()
 def distance(**kargs):
     #global count
-    weights = kargs
-    X.append(list(weights.values()))
+    weights_bias = kargs
+    weights_dict, bias_dict = {w:v for w,v in weights_bias.items() if 'w' in w}, {b:v for b,v in weights_bias.items() if 'b' in b},
+    print(weights_dict,bias_dict)
+    X.append(list(weights_dict.values())+list(bias_dict.values()))
     #print(weights)
-    pickle.dump((weights, architecture, activation),open('weights.p','wb'), protocol = 2)
+    pickle.dump((weights_dict, bias_dict, architecture, activation),open('weights.p','wb'), protocol = 2)
     os.system('python simulation.py >/dev/null 2>&1')
     distance = pickle.load(open('distance.p','rb'))
     #plt.clear()
@@ -37,6 +40,8 @@ def distance(**kargs):
     #count += 1
     return distance
 weights_permutations = {'w%d'%i:(np.linspace(-scaling_factor,scaling_factor,n_possible_weight_values) if rand_init else (np.random.rand(n_possible_weight_values)-0.5)*scaling_factor) for i in range(n_weights)} # (np.random.rand(100)-0.5)*0.5
+bias_permutations = {'b%d'%i:(np.linspace(-scaling_factor,scaling_factor,n_possible_weight_values) if rand_init else (np.random.rand(n_possible_weight_values)-0.5)*scaling_factor) for i in range(n_bias)}
+weights_permutations.update(bias_permutations)
 best_params, best_score, score_results, hist, log = maximize(distance,weights_permutations,{}, population_size=population_size, generations_number=generations_number, gene_mutation_prob=gene_mutation_prob, gene_crossover_prob = gene_mutation_prob, tournament_size=tournament_size, verbose=True)
 pickle.dump((best_params, best_score, score_results, hist, log),open('final_model.p','wb'))
 best_weights = {best_params[weight] for weight in weights_permutations}
