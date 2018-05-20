@@ -123,7 +123,8 @@ class Game(DirectObject):
     sys.exit(1)
 
   def endLoop(self):
-      pickle.dump(self.distance,open('distance.p','wb'))
+      self.penalized_distance = self.distance*(1.-numpy.exp(-self.time_max_steering/self.total_time))
+      pickle.dump(self.penalized_distance,open('distance.p','wb'))
       sys.exit()
       #quit()
       #print("Distance was: ",self.distance)
@@ -264,14 +265,18 @@ class Game(DirectObject):
     dx = numpy.linalg.norm(self.prevPos[-1] - self.prevPos[-2])
     self.distance += dx
     self.distance_text.setText('Distance=%f'%(self.distance))
-    if self.distance > 10000:
-        self.endLoop()
     #print(len(self.prevPos))
-    self.check_prevPos()
+
     dt = globalClock.getDt()
     self.total_time += dt
+    if abs(self.steering) == abs(self.steeringClamp):
+        self.time_max_steering += dt
     self.time_text.setText('TotalTime=%f'%(self.total_time))
-
+    self.time_maxsteer_text.setText('TotalTimeMaxSteer=%f'%(self.time_max_steering))
+    #self.penalized_distance = self.distance*(1.-numpy.exp(-self.time_max_steering/self.total_time))
+    if self.distance > 10000:
+        self.endLoop()
+    self.check_prevPos()
     self.speed = dx/dt
     self.speed_text.setText('Speed=%f'%(self.speed))
 
@@ -305,7 +310,10 @@ class Game(DirectObject):
     self.distance_text = OnscreenText(text='Distance=0', pos = (0.85,0.85), scale = 0.05, mayChange=1)#Directxxxxxx(distance='Distance=%d'%(0))
     self.speed_text = OnscreenText(text='Speed=0', pos = (0.85,0.80), scale = 0.05, mayChange=1)#Directxxxxxx(distance='Distance=%d'%(0))
     self.time_text = OnscreenText(text='TotalTime=0', pos = (0.85,0.75), scale = 0.05, mayChange=1)#Directxxxxxx(distance='Distance=%d'%(0))
+    self.time_maxsteer_text = OnscreenText(text='TotalTimeMaxSteer=0', pos = (0.85,0.70), scale = 0.05, mayChange=1)#Directxxxxxx(distance='Distance=%d'%(0))
+
     self.total_time = 0.
+    self.time_max_steering = 0.
     # World
     self.debugNP = self.worldNP.attachNewNode(BulletDebugNode('Debug'))
     self.debugNP.show()
@@ -381,11 +389,11 @@ class Game(DirectObject):
     self.sphere_col_np.show()"""
 
     self.yugo_col = CollisionNode('yugo_box')
-    self.yugo_col.addSolid(CollisionBox(Point3(0,0,0.5),0.9, 1.6, 0.2))
+    self.yugo_col.addSolid(CollisionBox(Point3(0,0,0.7),0.9, 1.6, 0.05))
     self.yugo_col.setFromCollideMask(BitMask32(1))
-    self.sphere_col_np = self.yugoNP.attachNewNode(self.yugo_col)
-    self.cTrav.addCollider(self.sphere_col_np,self.colHandler)
-    self.sphere_col_np.show()
+    self.box_col_np = self.yugoNP.attachNewNode(self.yugo_col)
+    self.cTrav.addCollider(self.box_col_np,self.colHandler)
+    self.box_col_np.show()
 
 
 

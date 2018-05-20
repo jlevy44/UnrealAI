@@ -5,7 +5,7 @@ import os, pickle, numpy as np
 # what parameters to set? randomized? can randomize the whole process.
 
 
-architecture, activation = [5,4,4,2], 'tanh'
+architecture, activation = [5,3,3,2], 'tanh'
 if architecture[0] < 2:
     architecture[0] = 2
 n_weights = sum([architecture[i]*architecture[i+1] for i in range(len(architecture)-1)])
