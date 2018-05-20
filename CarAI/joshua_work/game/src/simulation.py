@@ -124,7 +124,8 @@ class Game(DirectObject):
 
   def endLoop(self):
       pickle.dump(self.distance,open('distance.p','wb'))
-      quit()
+      sys.exit()
+      #quit()
       #print("Distance was: ",self.distance)
       #os.execv(sys.executable,['python']+[__file__])
       #taskMgr.running = False
@@ -350,7 +351,7 @@ class Game(DirectObject):
 
     np = self.worldNP.attachNewNode(BulletRigidBodyNode('Vehicle'))
     np.node().addShape(shape, ts)
-    np.setPos(0, 0, 1)
+    np.setPos(0, 0, 0.1)
     np.node().setMass(800.0)
     np.node().setDeactivationEnabled(False)
 

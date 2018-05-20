@@ -16,6 +16,9 @@ def distance(**kargs):
     os.system('python simulation.py')
     distance = pickle.load(open('distance.p','rb'))
     return distance
-
-best_params, best_score, score_results, hist, log = maximize(distance,{'w%d'%i:np.random.rand(100)-0.5 for i in range(36)},{},verbose=True)
+weights_permutations = {'w%d'%i:np.random.rand(100)-0.5 for i in range(36)}
+best_params, best_score, score_results, hist, log = maximize(distance,weights_permutations,{},verbose=True)
 pickle.dump((best_params, best_score, score_results, hist, log),open('final_model.p','wb'))
+best_weights = {best_params[weight] for weight in weights_permutations}
+pickle.dump((best_weights,architecture,activation),open('weights.p','wb'), protocol=2)
+# FIXME send best weights/model to weights.p when done
