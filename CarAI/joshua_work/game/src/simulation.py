@@ -31,7 +31,7 @@ from functools import reduce
 
 class NeuralNetGA:
 
-    def __init__(self,shape, activation):
+    def __init__(self, shape, activation):
         self.shape = shape
         self.hidden_layers_size = self.shape[1:-1]
         self.input_size = self.shape[0]
@@ -160,7 +160,7 @@ class Game(DirectObject):
     engineForce = 0.0
     brakeForce = 0.0
     if self.moves[0]:#inputState.isSet('forward'):
-      engineForce = 1000.0
+      engineForce = 2000.0 # 1000.
       brakeForce = 0.0
 
     if not self.moves[0]:#inputState.isSet('reverse'):
@@ -238,7 +238,7 @@ class Game(DirectObject):
               #print(r.getIntoNodePath().getName())
               if r.getIntoNodePath().getName() == 'Plane' and r.getFromNodePath().getName() == 'yugo_box':
                   self.endLoop()
-              if r.getIntoNodePath().getName() == 'Plane' and r.getFromNodePath().getName() in ['ray%d'%i for i in range(3)]: #Box
+              if r.getIntoNodePath().getName() == 'Plane' and r.getFromNodePath().getName() in ['ray%d'%i for i in range(self.n_rays)]: #Box
                   self.ray_col_vec_dict[r.getFromNodePath().getName()].append(numpy.linalg.norm(list(r.getSurfacePoint(r.getFromNodePath()))[:-1]))
       self.ray_col_vec_dict = {k: (min(self.ray_col_vec_dict[k]) if len(self.ray_col_vec_dict[k]) >= 1 else 10000) for k in self.ray_col_vec_dict}
       self.x = numpy.array(list(self.ray_col_vec_dict.values()))
@@ -249,14 +249,14 @@ class Game(DirectObject):
       #return entries
 
   def check_prevPos(self):
-      if len(self.prevPos) > 100:
+      if len(self.prevPos) > 80:
           #print(self.prevPos)
           #print(numpy.linalg.norm(self.prevPos[-1] - self.prevPos[0]))
-          if numpy.linalg.norm(self.prevPos[-1] - self.prevPos[0]) < 5:
+          if numpy.linalg.norm(self.prevPos[-1] - self.prevPos[0]) < 4.5:
               #print("ERROR")
               self.endLoop()
 
-          del self.prevPos[0:len(self.prevPos) - 100]
+          del self.prevPos[0:len(self.prevPos) - 80]
 
   def update(self, task):
 
@@ -336,7 +336,7 @@ class Game(DirectObject):
     #self.track = BulletVehicle(self.world, np.node())
     #self.track.setCoordinateSystem(ZUp)
     self.track_np = loader.loadModel('models/race_track_2.egg') # https://discourse.panda3d.org/t/panda3d-and-bullet-physics/15724/10
-    self.track_np.setPos(3, -5, -3.5)
+    self.track_np.setPos(-72, -7, -3.5)
     self.track_np.setScale(10)
     self.track_np.reparentTo(render)
 
@@ -351,7 +351,7 @@ class Game(DirectObject):
 
     np = self.worldNP.attachNewNode(BulletRigidBodyNode('Vehicle'))
     np.node().addShape(shape, ts)
-    np.setPos(0, 0, 0.1)
+    np.setPos(0, 0, 0.05)
     np.node().setMass(800.0)
     np.node().setDeactivationEnabled(False)
 
@@ -392,18 +392,21 @@ class Game(DirectObject):
 
     self.ray_col_np = {}
     self.ray_col_vec_dict = {}
-    for ray_dir in range(-1,2): # populate collision rays
+    self.n_rays = self.model.shape[0]
+    for i,ray_dir in enumerate(numpy.linspace(-numpy.pi/4,numpy.pi/4,self.n_rays)): # populate collision rays
+        #print(ray_dir)
         self.ray = CollisionRay()
-        self.ray.setOrigin(ray_dir,0.5,0.5)
-        self.ray.setDirection(ray_dir,1,0)
-        self.ray_col = CollisionNode('ray%d'%(ray_dir+1))
+        y_dir, x_dir = numpy.cos(ray_dir), numpy.sin(ray_dir)
+        self.ray.setOrigin(1.3*x_dir,1.3*y_dir,0.5)
+        self.ray.setDirection(x_dir,y_dir,0)
+        self.ray_col = CollisionNode('ray%d'%(i))
         self.ray_col.addSolid(self.ray)
         self.ray_col.setFromCollideMask(BitMask32.allOn())#(0x0f))#CollideMask.bit(0)
         #self.ray_col.setIntoCollideMask(CollideMask.allOff())
-        self.ray_col_np['ray%d'%(ray_dir+1)] = self.yugoNP.attachNewNode(self.ray_col)
-        self.cTrav.addCollider(self.ray_col_np['ray%d'%(ray_dir+1)],self.colHandler)
-        self.ray_col_np['ray%d'%(ray_dir+1)].show()
-        self.ray_col_vec_dict['ray%d'%(ray_dir+1)] = []
+        self.ray_col_np['ray%d'%(i)] = self.yugoNP.attachNewNode(self.ray_col)
+        self.cTrav.addCollider(self.ray_col_np['ray%d'%(i)],self.colHandler)
+        self.ray_col_np['ray%d'%(i)].show()
+        self.ray_col_vec_dict['ray%d'%(i)] = []
     self.world.attachVehicle(self.vehicle)
     self.cTrav.showCollisions(render)
 
@@ -434,8 +437,8 @@ class Game(DirectObject):
 
     # Steering info
     self.steering = 0.0            # degree
-    self.steeringClamp = 45.0      # degree
-    self.steeringIncrement = 120.0 # degree per second
+    self.steeringClamp = 38.0#45.0      # degree
+    self.steeringIncrement = 105.0#120.0 # degree per second
 
     # add previous positions
     self.prevPos = []
