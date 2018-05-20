@@ -17,7 +17,7 @@ def distance(**kargs):
     distance = pickle.load(open('distance.p','rb'))
     return distance
 weights_permutations = {'w%d'%i:np.random.rand(100)-0.5 for i in range(36)}
-best_params, best_score, score_results, hist, log = maximize(distance,weights_permutations,{},verbose=True)
+best_params, best_score, score_results, hist, log = maximize(distance,weights_permutations,{}, population_size=100, generations_number=10, gene_mutation_prob=0.3, gene_crossover_prob = 0.3, verbose=True)
 pickle.dump((best_params, best_score, score_results, hist, log),open('final_model.p','wb'))
 best_weights = {best_params[weight] for weight in weights_permutations}
 pickle.dump((best_weights,architecture,activation),open('weights.p','wb'), protocol=2)
