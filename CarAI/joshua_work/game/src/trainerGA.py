@@ -6,6 +6,11 @@ import os, pickle, numpy as np
 
 
 architecture, activation = [5,3,3,2], 'tanh'
+population_size=30
+generations_number=50
+gene_mutation_prob=0.35
+gene_crossover_prob = 0.35
+tournament_size = 4
 if architecture[0] < 2:
     architecture[0] = 2
 n_weights = sum([architecture[i]*architecture[i+1] for i in range(len(architecture)-1)])
@@ -29,7 +34,7 @@ def distance(**kargs):
     #count += 1
     return distance
 weights_permutations = {'w%d'%i:np.linspace(-5,5,1000) for i in range(n_weights)} # (np.random.rand(100)-0.5)*0.5
-best_params, best_score, score_results, hist, log = maximize(distance,weights_permutations,{}, population_size=20, generations_number=50, gene_mutation_prob=0.15, gene_crossover_prob = 0.15, verbose=True)
+best_params, best_score, score_results, hist, log = maximize(distance,weights_permutations,{}, population_size=population_size, generations_number=generations_number, gene_mutation_prob=gene_mutation_prob, gene_crossover_prob = gene_mutation_prob, tournament_size=tournament_size, verbose=True)
 pickle.dump((best_params, best_score, score_results, hist, log),open('final_model.p','wb'))
 best_weights = {best_params[weight] for weight in weights_permutations}
 pickle.dump((best_weights,architecture,activation),open('weights.p','wb'), protocol=2)
