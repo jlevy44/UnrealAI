@@ -177,13 +177,15 @@ class Game(DirectObject):
       engineForce = 0.0
       brakeForce = 100.0
 
-    if self.moves[1]:#inputState.isSet('turnLeft'):
-      self.steering += dt * self.steeringIncrement
-      self.steering = min(self.steering, self.steeringClamp)
+    if not self.moves[2]: # enabled steering lock
 
-    if not self.moves[1]:#inputState.isSet('turnRight'):
-      self.steering -= dt * self.steeringIncrement
-      self.steering = max(self.steering, -self.steeringClamp)
+        if self.moves[1]:#inputState.isSet('turnLeft'):
+          self.steering += dt * self.steeringIncrement
+          self.steering = min(self.steering, self.steeringClamp)
+
+        if not self.moves[1]:#inputState.isSet('turnRight'):
+          self.steering -= dt * self.steeringIncrement
+          self.steering = max(self.steering, -self.steeringClamp)
     """
     if inputState.isSet('forward'):
       engineForce = 1000.0
