@@ -132,7 +132,7 @@ class Game(DirectObject):
     sys.exit(1)
 
   def endLoop(self):
-      self.penalized_distance = self.distance*(1.-numpy.exp(-self.time_max_steering/self.total_time))
+      self.penalized_distance = self.distance*(numpy.exp(-self.time_max_steering/self.total_time))
       pickle.dump(self.penalized_distance,open('distance.p','wb'))
       sys.exit()
       #quit()
