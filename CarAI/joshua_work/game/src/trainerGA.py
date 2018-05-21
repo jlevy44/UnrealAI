@@ -7,7 +7,7 @@ import os, pickle, numpy as np
 
 architecture, activation = [3,5,2], 'tanh' # relu
 population_size=70
-generations_number=15
+generations_number=7
 gene_mutation_prob=0.4
 gene_crossover_prob = 0.15
 tournament_size = 3
