@@ -173,7 +173,7 @@ class Game(DirectObject):
   def processInput(self, dt):
     engineForce = 0.0
     brakeForce = 0.0
-    if self.moves[0]:#inputState.isSet('forward'):
+    if self.moves[0]:#inputState.isSet('forward'): FIXME maybe engine and brake can be linked to self.y, rectified, continuous
       engineForce = 2000.0 # 1000.
       brakeForce = 0.0
 
@@ -181,6 +181,13 @@ class Game(DirectObject):
       engineForce = 200.0 #0.0
       brakeForce = 100.0
 
+    self.steering = self.y[1]
+    if self.moves[1]:
+        self.steering = min(self.steering, self.steeringClamp)
+    if not self.moves[1]:
+        self.steering = max(self.steering, -self.steeringClamp)
+
+    """ # FIXME option may be better if self.steering is fed into self.y[3] for 4th element
     if not self.moves[2]: # enabled steering lock
 
         if self.moves[1]:#inputState.isSet('turnLeft'):
@@ -190,7 +197,7 @@ class Game(DirectObject):
         if not self.moves[1]:#inputState.isSet('turnRight'):
           self.steering -= dt * self.steeringIncrement
           self.steering = max(self.steering, -self.steeringClamp)
-    """
+    """"""
     if inputState.isSet('forward'):
       engineForce = 1000.0
       brakeForce = 0.0
