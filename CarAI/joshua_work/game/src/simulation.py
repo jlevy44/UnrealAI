@@ -36,7 +36,7 @@ class NeuralNetGA:
         self.hidden_layers_size = self.shape[1:-1]
         self.input_size = self.shape[0]
         self.output_size = self.shape[-1]
-        self.activation_functions = {'tanh': lambda x: numpy.tanh(x/4.)*10.}
+        self.activation_functions = {'tanh': lambda x: numpy.tanh(x/4.)*10., 'relu':lambda x: numpy.maximum(x,0.,x)}
         self.activation = self.activation_functions[activation]
 
         self.weights_dimensions = [(self.shape[i],self.shape[i+1]) for i in range(len(self.shape)-1)]
@@ -52,11 +52,14 @@ class NeuralNetGA:
         #self.y = reduce(lambda x,y: numpy.vectorize(self.activation)(numpy.dot(x,y)), [X] + self.weights)
         current_layer = X
         #print(len(self.weights),len(self.bias))
-        for i in range(len(self.weights)):
+        for i in range(len(self.weights)-1):
             #print(i)
             current_layer = self.activation(numpy.dot(current_layer,self.weights[i]) + self.bias[i])
-        self.y = current_layer
-        #print(X,self.y)
+        if self.activation == 'relu':
+            self.y = numpy.dot(current_layer,self.weights[-1]) + self.bias[-1]
+        else:
+            self.y = self.activation(numpy.dot(current_layer,self.weights[-1]) + self.bias[-1])
+        print(X)
         return self.y
 
     def assign_weights(self, weights_dict, bias_dict):
@@ -164,7 +167,8 @@ class Game(DirectObject):
   def calculate_moves(self):
       self.y = self.model.predict(self.x)
       #print(self.y)
-      self.moves = self.y > 0 # 0.5
+      self.moves = self.y > 0 #+ self.model_offset # 0.5
+      #self.moves[0] = True # FIXME test
 
   def processInput(self, dt):
     engineForce = 0.0
@@ -174,7 +178,7 @@ class Game(DirectObject):
       brakeForce = 0.0
 
     if not self.moves[0]:#inputState.isSet('reverse'):
-      engineForce = 0.0
+      engineForce = 200.0 #0.0
       brakeForce = 100.0
 
     if not self.moves[2]: # enabled steering lock
@@ -463,6 +467,7 @@ class Game(DirectObject):
     self.prevPos = []
     self.prevPos.append(self.yugoNP.getPos(render))
 
+    self.model_offset = 0.5 if self.model.activation == 'relu' else 0.
     # Box
     """
     for i,j in [(0,8),(-3,5),(6,-5),(8,3),(-4,-4),(0,0)]:

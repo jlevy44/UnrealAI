@@ -5,16 +5,18 @@ import os, pickle, numpy as np
 # what parameters to set? randomized? can randomize the whole process.
 
 
-architecture, activation = [3,4,5,4,3], 'tanh'
-population_size=100
-generations_number=20
-gene_mutation_prob=0.40
-gene_crossover_prob = 0.25
+architecture, activation = [3,5,3], 'tanh' # relu
+population_size=70
+generations_number=15
+gene_mutation_prob=0.4
+gene_crossover_prob = 0.15
 tournament_size = 3
 rand_init = False
 n_possible_weight_values = 1000
-weights_scaling_factor = 10.
-bias_scaling_factor = 0.2
+weights_scaling_factor = 30.
+bias_scaling_factor = 20.
+suppress_output = True
+
 if architecture[0] < 2:
     architecture[0] = 2
 n_weights = sum([architecture[i]*architecture[i+1] for i in range(len(architecture)-1)])
@@ -31,7 +33,7 @@ def distance(**kargs):
     X.append(list(weights_dict.values())+list(bias_dict.values()))
     #print(weights)
     pickle.dump((weights_dict, bias_dict, architecture, activation),open('weights.p','wb'), protocol = 2)
-    os.system('python simulation.py >/dev/null 2>&1')
+    os.system('python simulation.py %s >/dev/null 2>&1'%('#' if not suppress_output else ''))
     distance = pickle.load(open('distance.p','rb'))
     #plt.clear()
     #plt.plot(y)
@@ -41,7 +43,10 @@ def distance(**kargs):
     #count += 1
     return distance
 weights_permutations = {'w%d'%i:(np.linspace(-weights_scaling_factor,weights_scaling_factor,n_possible_weight_values) if rand_init else (np.random.rand(n_possible_weight_values)-0.5)*weights_scaling_factor) for i in range(n_weights)} # (np.random.rand(100)-0.5)*0.5
-bias_permutations = {'b%d'%i:(np.linspace(-bias_scaling_factor,bias_scaling_factor,n_possible_weight_values) if rand_init else (np.random.rand(n_possible_weight_values)-0.5)*bias_scaling_factor) for i in range(n_bias)}
+bias_permutations = {'b%d'%i:(np.linspace(-bias_scaling_factor ,bias_scaling_factor,n_possible_weight_values) if rand_init else (np.random.rand(n_possible_weight_values)-0.5 )*bias_scaling_factor) for i in range(n_bias)}
+#weights_permutations = {'w%d'%i:(np.linspace(-weights_scaling_factor,weights_scaling_factor,n_possible_weight_values) + (weights_scaling_factor if activation == 'relu' else 0.) if rand_init else (np.random.rand(n_possible_weight_values)-0.5 + (0.5 if activation == 'relu' else 0.))*weights_scaling_factor) for i in range(n_weights)} # (np.random.rand(100)-0.5)*0.5
+#bias_permutations = {'b%d'%i:(np.linspace(-bias_scaling_factor ,bias_scaling_factor,n_possible_weight_values) + (bias_scaling_factor if activation == 'relu' else 0.) if rand_init else (np.random.rand(n_possible_weight_values)-0.5 + (0.5 if activation == 'relu' else 0.))*bias_scaling_factor) for i in range(n_bias)}
+
 weights_permutations.update(bias_permutations)
 best_params, best_score, score_results, hist, log = maximize(distance,weights_permutations,{}, population_size=population_size, generations_number=generations_number, gene_mutation_prob=gene_mutation_prob, gene_crossover_prob = gene_mutation_prob, tournament_size=tournament_size, verbose=True)
 pickle.dump((best_params, best_score, score_results, hist, log),open('final_model.p','wb'))
