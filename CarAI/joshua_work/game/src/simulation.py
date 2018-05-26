@@ -43,6 +43,28 @@ class NeuralNetGA:
         #print(self.weights_dimensions)
         self.weights_indices = numpy.cumsum([dimensions[0]*dimensions[1] for dimensions in self.weights_dimensions])
         self.bias_indices = numpy.cumsum(self.shape[1:])
+        self.n_values = len(self.shape)
+        self.bottom, self.top, self.left, self.right = .1,.9,.1,.9
+        self.v_spacing = (self.top - self.bottom)/float(max(self.shape))
+        self.h_spacing = (self.right - self.left)/float(len(self.shape) - 1)
+        self.ax.axis('off')
+        self.layer_top = []
+        self.pos = []
+        self.fig = plt.figure()
+        self.ax = fig.gca()
+        for n, layer_size in enumerate(self.shape):
+            self.layer_top.append(self.v_spacing*(self.layer_size - 1)/2. + (self.top + self.bottom)/2.)
+            self.pos.append([(n*self.h_spacing + self.left,self.layer_top - m*self.v_spacing) for m in range(layer_size)]) # populate x,y data
+        # populate edges here, add circles only when model is running...
+        # https://gist.github.com/anbrjohn/7116fa0b59248375cd0c0371d6107a59
+        for n, (layer_size_a, layer_size_b) in enumerate(zip(self.shape[:-1], self.shape[1:])):
+            layer_top_a = self.v_spacing*(layer_size_a - 1)/2. + (self.top + self.bottom)/2.
+            layer_top_b = self.v_spacing*(layer_size_b - 1)/2. + (self.top + self.bottom)/2.
+            for m in range(layer_size_a):
+                for o in range(layer_size_b):
+                    line = plt.Line2D([n*self.h_spacing + self.left, (n + 1)*self.h_spacing + self.left],
+                                      [self.layer_top_a - m*self.v_spacing, layer_top_b - o*self.v_spacing], c='k')
+                    self.ax.add_artist(line)
         #print(self.weights_indices)
         # F2(W2*F(Wx))
 
@@ -50,17 +72,32 @@ class NeuralNetGA:
         #print(X,self.weights)
         #print([X] + self.weights)
         #self.y = reduce(lambda x,y: numpy.vectorize(self.activation)(numpy.dot(x,y)), [X] + self.weights)
+        self.layer_vals = []
         current_layer = X
+        self.layer_vals.append(X)
         #print(len(self.weights),len(self.bias))
         for i in range(len(self.weights)-1):
             #print(i)
             current_layer = self.activation(numpy.dot(current_layer,self.weights[i]) + self.bias[i])
+            self.layer_vals.append(current_layer)
         if self.activation == 'relu':
             self.y = numpy.dot(current_layer,self.weights[-1]) + self.bias[-1]
         else:
             self.y = self.activation(numpy.dot(current_layer,self.weights[-1]) + self.bias[-1])
+        self.layer_vals.append(self.y)
         print(X)
         return self.y
+
+    def plot_NN(self,fig,ax):
+        self.figure = fig
+        self.axis = ax
+        for n, layer_size in enumerate(self.shape):
+            mx = max(self.layer_vals[n])
+            for m in range(layer_size):
+                x,y = tuple(self.pos[n][m])
+                circle = plt.Circle(x,y,self.v_spacing/4.,color=(self.layer_vals[n][m]/mx,0.5,0.5),ec='k', zorder=4)
+                self.axis.add_artist(circle)
+        fig.savefig('neural_net_vis.png') # https://www.panda3d.org/manual/index.php/OnscreenImage
 
     def assign_weights(self, weights_dict, bias_dict):
         #print(enumerate(numpy.split(numpy.array(weights_dict.values()),self.weights_indices[:-1]).tolist()))

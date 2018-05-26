@@ -5,7 +5,7 @@ import os, pickle, numpy as np
 # what parameters to set? randomized? can randomize the whole process.
 
 
-architecture, activation = [3,5,2], 'tanh' # relu
+architecture, activation = [3,3,2], 'tanh' # relu
 population_size=70
 generations_number=7
 gene_mutation_prob=0.4
@@ -37,7 +37,11 @@ def distance(**kargs):
     distance = pickle.load(open('distance.p','rb'))
     #plt.clear()
     #plt.plot(y)
+
     y.append(distance)
+    if distance >= max(y):
+        os.system('scp distance.p distance_max.p')
+
     print("Max Distance = %f"%max(y))
     #pickle.dump(distance,open('distance_realtime.p','wb'))
     #count += 1
