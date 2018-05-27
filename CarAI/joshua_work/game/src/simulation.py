@@ -375,7 +375,7 @@ class Game(DirectObject):
     self.speed_text = OnscreenText(text='Speed=0', pos = (0.85,0.80), scale = 0.05, mayChange=1)#Directxxxxxx(distance='Distance=%d'%(0))
     self.time_text = OnscreenText(text='TotalTime=0', pos = (0.85,0.75), scale = 0.05, mayChange=1)#Directxxxxxx(distance='Distance=%d'%(0))
     self.time_maxsteer_text = OnscreenText(text='TotalTimeMaxSteer=0', pos = (0.85,0.70), scale = 0.05, mayChange=1)#Directxxxxxx(distance='Distance=%d'%(0))
-    self.nn_image = OnscreenImage(image='neural_net_vis.png', pos= (0.85,0,0.15), scale=0.05) # http://dev-wiki.gestureworks.com/index.php/GestureWorksCore:Python_%26_Panda3D:_Getting_Started_II_(Hello_Multitouch)#8._Create_a_method_to_draw_touchpoint_data
+    self.nn_image = OnscreenImage(image='blank.png', pos= (0.85,0,0.15), scale=0.45) # http://dev-wiki.gestureworks.com/index.php/GestureWorksCore:Python_%26_Panda3D:_Getting_Started_II_(Hello_Multitouch)#8._Create_a_method_to_draw_touchpoint_data
     self.total_time = 0.
     self.time_max_steering = 0.
     # World
