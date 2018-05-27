@@ -5,7 +5,7 @@ import os, pickle, numpy as np
 # what parameters to set? randomized? can randomize the whole process.
 
 
-architecture, activation = [3,3,2], 'tanh' # relu
+architecture, activation = [3,4,2], 'tanh' # relu
 population_size=70
 generations_number=7
 gene_mutation_prob=0.4
