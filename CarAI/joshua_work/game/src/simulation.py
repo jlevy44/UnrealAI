@@ -4,7 +4,10 @@
 
 import sys, numpy, os
 import pickle
+import matplotlib.pyplot as plt
+from matplotlib.patches import Circle
 import direct.directbase.DirectStart
+from direct.gui.OnscreenImage import OnscreenImage
 
 from direct.showbase.DirectObject import DirectObject
 from direct.showbase.InputStateGlobal import inputState
@@ -47,14 +50,14 @@ class NeuralNetGA:
         self.bottom, self.top, self.left, self.right = .1,.9,.1,.9
         self.v_spacing = (self.top - self.bottom)/float(max(self.shape))
         self.h_spacing = (self.right - self.left)/float(len(self.shape) - 1)
-        self.ax.axis('off')
         self.layer_top = []
         self.pos = []
         self.fig = plt.figure()
-        self.ax = fig.gca()
+        self.ax = self.fig.gca()
+        #self.ax('off')
         for n, layer_size in enumerate(self.shape):
-            self.layer_top.append(self.v_spacing*(self.layer_size - 1)/2. + (self.top + self.bottom)/2.)
-            self.pos.append([(n*self.h_spacing + self.left,self.layer_top - m*self.v_spacing) for m in range(layer_size)]) # populate x,y data
+            self.layer_top.append(self.v_spacing*(layer_size - 1)/2. + (self.top + self.bottom)/2.)
+            self.pos.append([(n*self.h_spacing + self.left,self.layer_top[n] - m*self.v_spacing) for m in range(layer_size)]) # populate x,y data
         # populate edges here, add circles only when model is running...
         # https://gist.github.com/anbrjohn/7116fa0b59248375cd0c0371d6107a59
         for n, (layer_size_a, layer_size_b) in enumerate(zip(self.shape[:-1], self.shape[1:])):
@@ -63,7 +66,7 @@ class NeuralNetGA:
             for m in range(layer_size_a):
                 for o in range(layer_size_b):
                     line = plt.Line2D([n*self.h_spacing + self.left, (n + 1)*self.h_spacing + self.left],
-                                      [self.layer_top_a - m*self.v_spacing, layer_top_b - o*self.v_spacing], c='k')
+                                      [layer_top_a - m*self.v_spacing, layer_top_b - o*self.v_spacing], c='k')
                     self.ax.add_artist(line)
         #print(self.weights_indices)
         # F2(W2*F(Wx))
@@ -88,16 +91,16 @@ class NeuralNetGA:
         print(X)
         return self.y
 
-    def plot_NN(self,fig,ax):
-        self.figure = fig
-        self.axis = ax
+    def plot_NN(self):
+        self.figure = self.fig
+        self.axis = self.ax
         for n, layer_size in enumerate(self.shape):
             mx = max(self.layer_vals[n])
             for m in range(layer_size):
-                x,y = tuple(self.pos[n][m])
-                circle = plt.Circle(x,y,self.v_spacing/4.,color=(self.layer_vals[n][m]/mx,0.5,0.5),ec='k', zorder=4)
+                print((self.layer_vals[n][m]/mx,0.5,0.5))
+                circle = Circle(tuple(self.pos[n][m]),radius=self.v_spacing/4.,color=(self.layer_vals[n][m]/mx/2.+0.5,0.5,0.5),ec='k', zorder=4)
                 self.axis.add_artist(circle)
-        fig.savefig('neural_net_vis.png') # https://www.panda3d.org/manual/index.php/OnscreenImage
+        self.figure.savefig('neural_net_vis.png') # https://www.panda3d.org/manual/index.php/OnscreenImage
 
     def assign_weights(self, weights_dict, bias_dict):
         #print(enumerate(numpy.split(numpy.array(weights_dict.values()),self.weights_indices[:-1]).tolist()))
@@ -341,6 +344,8 @@ class Game(DirectObject):
 
     self.check_collisions()
     self.calculate_moves()
+    self.model.plot_NN()
+    self.nn_image.setImage('neural_net_vis.png')
     self.ray_col_vec_dict = {k:[] for k in self.ray_col_vec_dict}
     self.processInput(dt)
     self.world.doPhysics(dt, 10, 0.008)
@@ -370,7 +375,7 @@ class Game(DirectObject):
     self.speed_text = OnscreenText(text='Speed=0', pos = (0.85,0.80), scale = 0.05, mayChange=1)#Directxxxxxx(distance='Distance=%d'%(0))
     self.time_text = OnscreenText(text='TotalTime=0', pos = (0.85,0.75), scale = 0.05, mayChange=1)#Directxxxxxx(distance='Distance=%d'%(0))
     self.time_maxsteer_text = OnscreenText(text='TotalTimeMaxSteer=0', pos = (0.85,0.70), scale = 0.05, mayChange=1)#Directxxxxxx(distance='Distance=%d'%(0))
-
+    self.nn_image = OnscreenImage(image='neural_net_vis.png', pos= (0.85,0,0.15), scale=0.05) # http://dev-wiki.gestureworks.com/index.php/GestureWorksCore:Python_%26_Panda3D:_Getting_Started_II_(Hello_Multitouch)#8._Create_a_method_to_draw_touchpoint_data
     self.total_time = 0.
     self.time_max_steering = 0.
     # World
