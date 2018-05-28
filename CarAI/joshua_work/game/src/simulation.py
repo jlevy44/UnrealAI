@@ -62,21 +62,20 @@ class NeuralNetGA:
             self.pos.append([(n*self.h_spacing + self.left,self.layer_top[n] - m*self.v_spacing) for m in range(layer_size)]) # populate x,y data
         # populate edges here, add circles only when model is running...
         # https://gist.github.com/anbrjohn/7116fa0b59248375cd0c0371d6107a59
+        self.shapes = {}
         for n, (layer_size_a, layer_size_b) in enumerate(zip(self.shape[:-1], self.shape[1:])):
             layer_top_a = self.v_spacing*(layer_size_a - 1)/2. + (self.top + self.bottom)/2.
             layer_top_b = self.v_spacing*(layer_size_b - 1)/2. + (self.top + self.bottom)/2.
             for m in range(layer_size_a):
                 for o in range(layer_size_b):
-                    line = plt.Line2D([n*self.h_spacing + self.left, (n + 1)*self.h_spacing + self.left],
+                    self.shapes['line%d%d'%(m,o)] = plt.Line2D([n*self.h_spacing + self.left, (n + 1)*self.h_spacing + self.left],
                                       [layer_top_a - m*self.v_spacing, layer_top_b - o*self.v_spacing], c='k')
-                    self.ax.add_artist(line)
-        #self.artists = self.ax.artists
-        #for a in self.artists:
-        #    a.set_animated(True)
+        for n, layer_size in enumerate(self.shape):
+            for m in range(layer_size):
+                self.shapes['%d%d'%(n,m)] = Circle(tuple(self.pos[n][m]),radius=self.v_spacing/4.,color=(0.5,0.5,0.5),ec='k', zorder=4)
         self.fig.canvas.draw()
-        #self.bg_cache = self.fig.canvas.copy_from_bbox(self.ax.bbox)
-        #print(self.weights_indices)
-        # F2(W2*F(Wx))
+        self.axbackground = self.fig.canvas.copy_from_bbox(self.ax.bbox)
+
 
     def predict(self,X):
         #print(X,self.weights)
@@ -100,26 +99,19 @@ class NeuralNetGA:
 
     def plot_NN(self):
         #self.fig.canvas.restore_region(self.bg_cache)
-        self.figure = self.fig
-        self.axis = self.ax
+        #self.figure = self.fig
+        self.fig.canvas.restore_region(self.axbackground)
+        #self.axis = self.ax
         #artists2 = []
         for n, layer_size in enumerate(self.shape):
-            mx = max(self.layer_vals[n])
+            mx = max(map(abs,self.layer_vals[n]))
             for m in range(layer_size):
                 #print((self.layer_vals[n][m]/mx,0.5,0.5))
-                circle = Circle(tuple(self.pos[n][m]),radius=self.v_spacing/4.,color=(self.layer_vals[n][m]/mx/2.1+0.5,0.5,0.5),ec='k', zorder=4)
-                self.axis.add_artist(circle)
-                #artists2.append(circle)
-        #for a in self.artists + artists2:
-        #    a.axes.draw_artist(a)
-        #self.ax.figure.canvas.blit(self.ax.bbox)
-        #self.fig.canvas.start_event_loop(10)#interval)
-        self.figure.canvas.draw()
-        self.figure.show()
-        #self.figure.clear()
-        #self.axis.clear()
-        #self.figure.canvas.draw()#savefig('neural_net_vis.png') # https://www.panda3d.org/manual/index.php/OnscreenImage
-        #self.figure.canvas.flush_events()
+                self.shapes['%d%d'%(n,m)] = Circle(tuple(self.pos[n][m]),radius=self.v_spacing/4.,color=(self.layer_vals[n][m]/mx/2.1+0.5,0.5,0.5),ec='k', zorder=4)
+
+        self.fig.canvas.blit(self.ax.bbox)
+        self.fig.canvas.draw()
+
 
     def assign_weights(self, weights_dict, bias_dict):
         #print(enumerate(numpy.split(numpy.array(weights_dict.values()),self.weights_indices[:-1]).tolist()))
