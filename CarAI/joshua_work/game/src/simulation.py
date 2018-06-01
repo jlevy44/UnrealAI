@@ -8,7 +8,9 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Circle
 import direct.directbase.DirectStart
 from direct.gui.OnscreenImage import OnscreenImage
-
+import pyqtgraph as pg
+#from PyQt5 import QtGui
+from itertools import combinations, permutations
 from direct.showbase.DirectObject import DirectObject
 from direct.showbase.InputStateGlobal import inputState
 from direct.gui.DirectGui import *
@@ -52,29 +54,59 @@ class NeuralNetGA:
         self.h_spacing = (self.right - self.left)/float(len(self.shape) - 1)
         self.layer_top = []
         self.pos = []
+        # try this solution! Definte connections between nodes https://stackoverflow.com/questions/46868432/pyqtgraph-change-color-of-node-and-its-edges-on-click
         #plt.ion()
-        self.fig = plt.figure()
-        self.ax = self.fig.gca()
+        #self.fig = plt.figure()
+        #self.ax = self.fig.gca()
         #self.fig.show()
         #self.ax('off')
+        #self.pw = pg.plot()
+        self.w = pg.GraphicsWindow()
+        self.v = self.w.addViewBox()
+        self.v.setAspectLocked()
         for n, layer_size in enumerate(self.shape):
             self.layer_top.append(self.v_spacing*(layer_size - 1)/2. + (self.top + self.bottom)/2.)
-            self.pos.append([(n*self.h_spacing + self.left,self.layer_top[n] - m*self.v_spacing) for m in range(layer_size)]) # populate x,y data
+            self.pos.extend([(n*self.h_spacing + self.left,self.layer_top[n] - m*self.v_spacing) for m in range(layer_size)]) # populate x,y data
+        self.pos = numpy.array(self.pos) # node points
+        self.nodes = [0] + numpy.cumsum(self.shape).tolist()
+        #wt_idx = [0]+self.weights_indices.tolist()
+        #print(list(range(wt_idx[0],wt_idx[1]))+list(range(wt_idx[1],wt_idx[2])))
+        self.connections = numpy.vstack([numpy.array(numpy.meshgrid(range(self.nodes[i],self.nodes[i+1]),range(self.nodes[i+1],self.nodes[i+2]))).T.reshape(-1,2) for i in range(len(self.nodes)-2)])
+        #https://stackoverflow.com/questions/1208118/using-numpy-to-build-an-array-of-all-combinations-of-two-arrays
+        # https://stackoverflow.com/questions/46868432/pyqtgraph-change-color-of-node-and-its-edges-on-click
+        self.graph = pg.GraphItem()
+        self.v.addItem(self.graph)
+        #self.graph.setData(x=[1,2],y=[2,2],size=5,symbol='o')
+
+        self.graph.setData(pos=self.pos,adj=self.connections,size=30,symbolBrush=[pg.mkBrush(color='w') for symbol in range(len(self.pos))])
+        pg.QtGui.QApplication.processEvents()
         # populate edges here, add circles only when model is running...
         # https://gist.github.com/anbrjohn/7116fa0b59248375cd0c0371d6107a59
-        self.shapes = {}
+        """self.shapes = {}
         for n, (layer_size_a, layer_size_b) in enumerate(zip(self.shape[:-1], self.shape[1:])):
             layer_top_a = self.v_spacing*(layer_size_a - 1)/2. + (self.top + self.bottom)/2.
             layer_top_b = self.v_spacing*(layer_size_b - 1)/2. + (self.top + self.bottom)/2.
             for m in range(layer_size_a):
                 for o in range(layer_size_b):
-                    self.shapes['line%d%d'%(m,o)] = plt.Line2D([n*self.h_spacing + self.left, (n + 1)*self.h_spacing + self.left],
-                                      [layer_top_a - m*self.v_spacing, layer_top_b - o*self.v_spacing], c='k')
+                    self.shapes['line%d%d'%(m,o)] = self.pw.plot([n*self.h_spacing + self.left, (n + 1)*self.h_spacing + self.left],
+                                      [layer_top_a - m*self.v_spacing, layer_top_b - o*self.v_spacing], clear=False)#plt.Line2D([n*self.h_spacing + self.left, (n + 1)*self.h_spacing + self.left],
+                                      #[layer_top_a - m*self.v_spacing, layer_top_b - o*self.v_spacing], c='k')
+
+        X,Y,C = [],[],[]""""""
         for n, layer_size in enumerate(self.shape):
             for m in range(layer_size):
-                self.shapes['%d%d'%(n,m)] = Circle(tuple(self.pos[n][m]),radius=self.v_spacing/4.,color=(0.5,0.5,0.5),ec='k', zorder=4)
-        self.fig.canvas.draw()
-        self.axbackground = self.fig.canvas.copy_from_bbox(self.ax.bbox)
+                x,y = tuple(self.pos[n][m])
+                X.append(x)
+                Y.append(y)
+                C.append('b')
+        self.pw.plot(x=X,y=Y,color=C,size=numpy.ones(len(X))*self.v_spacing/4.)
+        pg.QtGui.QApplication.processEvents()"""
+        #pg.QtGui.QApplication.instance().exec_()
+        #self.shapes['%d%d'%(n,m)] = self.pw.plot(x=[x],y=[y],color='w',size=self.v_spacing/4., symbol='o')#Circle(tuple(self.pos[n][m]),radius=self.v_spacing/4.,color=(0.5,0.5,0.5),ec='k', zorder=4)
+        #self.shapes['%d%d'%(n,m)].setBrush(color='w')
+        #self.pw.addItem(self.shapes['%d%d'%(n,m)])
+        #self.fig.canvas.draw()
+        #self.axbackground = self.fig.canvas.copy_from_bbox(self.ax.bbox)
 
 
     def predict(self,X):
@@ -100,17 +132,28 @@ class NeuralNetGA:
     def plot_NN(self):
         #self.fig.canvas.restore_region(self.bg_cache)
         #self.figure = self.fig
-        self.fig.canvas.restore_region(self.axbackground)
+        #self.fig.canvas.restore_region(self.axbackground)
         #self.axis = self.ax
         #artists2 = []
+
+        X,Y,C = [],[],[]
         for n, layer_size in enumerate(self.shape):
             mx = max(map(abs,self.layer_vals[n]))
             for m in range(layer_size):
                 #print((self.layer_vals[n][m]/mx,0.5,0.5))
-                self.shapes['%d%d'%(n,m)] = Circle(tuple(self.pos[n][m]),radius=self.v_spacing/4.,color=(self.layer_vals[n][m]/mx/2.1+0.5,0.5,0.5),ec='k', zorder=4)
-
-        self.fig.canvas.blit(self.ax.bbox)
-        self.fig.canvas.draw()
+                #x,y = self.pos[n][m]
+                #X.append(x)
+                #Y.append(y)
+                C.append((128.*(self.layer_vals[n][m]/mx/2.01+0.5),128,128))
+                #self.shapes['%d%d'%(n,m)].setBrush(pg.mkBrush(color='b'))
+                #self.shapes['%d%d'%(n,m)].setBrush(color=(128.*(self.layer_vals[n][m]/mx/2.01+0.5),128,128)) #= plt.scatter(x=x,y=y,s=self.v_spacing/4.,c=(self.layer_vals[n][m]/mx/2.1+0.5,0.5,0.5))#Circle(tuple(self.pos[n][m]),radius=self.v_spacing/4.,color=(self.layer_vals[n][m]/mx/2.1+0.5,0.5,0.5),ec='k', zorder=4)
+        """self.pw.plot(x=X,y=Y,color=C,size=self.v_spacing/4.)
+        """
+        self.graph.setData(pos=self.pos,adj=self.connections,size=30,symbolBrush=[pg.mkBrush(color=c) for c in C])
+        pg.QtGui.QApplication.processEvents()
+        #self.fig.canvas.blit(self.ax.bbox)
+        #self.fig.canvas.draw()
+        #self.figure.show()
 
 
     def assign_weights(self, weights_dict, bias_dict):
