@@ -78,7 +78,7 @@ class NeuralNetGA:
         self.v.addItem(self.graph)
         #self.graph.setData(x=[1,2],y=[2,2],size=5,symbol='o')
 
-        self.graph.setData(pos=self.pos,adj=self.connections,size=30,symbolBrush=[pg.mkBrush(color='w') for symbol in range(len(self.pos))])
+        self.graph.setData(pos=self.pos,adj=self.connections,size=50,symbolBrush=[pg.mkBrush(color='w') for symbol in range(len(self.pos))])
         pg.QtGui.QApplication.processEvents()
         # populate edges here, add circles only when model is running...
         # https://gist.github.com/anbrjohn/7116fa0b59248375cd0c0371d6107a59
@@ -144,12 +144,13 @@ class NeuralNetGA:
                 #x,y = self.pos[n][m]
                 #X.append(x)
                 #Y.append(y)
-                C.append((128.*(self.layer_vals[n][m]/mx/2.01+0.5),128,128))
+                val = 128.*(self.layer_vals[n][m]/mx/2.+0.5)
+                C.append((255,128,val))
                 #self.shapes['%d%d'%(n,m)].setBrush(pg.mkBrush(color='b'))
                 #self.shapes['%d%d'%(n,m)].setBrush(color=(128.*(self.layer_vals[n][m]/mx/2.01+0.5),128,128)) #= plt.scatter(x=x,y=y,s=self.v_spacing/4.,c=(self.layer_vals[n][m]/mx/2.1+0.5,0.5,0.5))#Circle(tuple(self.pos[n][m]),radius=self.v_spacing/4.,color=(self.layer_vals[n][m]/mx/2.1+0.5,0.5,0.5),ec='k', zorder=4)
         """self.pw.plot(x=X,y=Y,color=C,size=self.v_spacing/4.)
         """
-        self.graph.setData(pos=self.pos,adj=self.connections,size=30,symbolBrush=[pg.mkBrush(color=c) for c in C])
+        self.graph.setData(pos=self.pos,adj=self.connections,size=50,symbolBrush=[pg.mkBrush(color=c) for c in C])
         pg.QtGui.QApplication.processEvents()
         #self.fig.canvas.blit(self.ax.bbox)
         #self.fig.canvas.draw()
