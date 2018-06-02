@@ -62,6 +62,8 @@ class NeuralNetGA:
         #self.ax('off')
         #self.pw = pg.plot()
         self.w = pg.GraphicsWindow()
+        self.w.setGeometry(800,400,400,400)
+        #self.w.resize(200,200)
         self.v = self.w.addViewBox()
         self.v.setAspectLocked()
         for n, layer_size in enumerate(self.shape):
@@ -145,7 +147,7 @@ class NeuralNetGA:
                 #X.append(x)
                 #Y.append(y)
                 val = 128.*(self.layer_vals[n][m]/mx/2.+0.5)
-                C.append((255,128,val))
+                C.append((0,val,val))
                 #self.shapes['%d%d'%(n,m)].setBrush(pg.mkBrush(color='b'))
                 #self.shapes['%d%d'%(n,m)].setBrush(color=(128.*(self.layer_vals[n][m]/mx/2.01+0.5),128,128)) #= plt.scatter(x=x,y=y,s=self.v_spacing/4.,c=(self.layer_vals[n][m]/mx/2.1+0.5,0.5,0.5))#Circle(tuple(self.pos[n][m]),radius=self.v_spacing/4.,color=(self.layer_vals[n][m]/mx/2.1+0.5,0.5,0.5),ec='k', zorder=4)
         """self.pw.plot(x=X,y=Y,color=C,size=self.v_spacing/4.)

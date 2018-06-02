@@ -15,7 +15,7 @@ rand_init = False
 n_possible_weight_values = 1000
 weights_scaling_factor = 30.
 bias_scaling_factor = 20.
-suppress_output = False
+suppress_output = True
 
 if architecture[0] < 2:
     architecture[0] = 2
