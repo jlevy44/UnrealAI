@@ -15,7 +15,7 @@ from direct.showbase.DirectObject import DirectObject
 from direct.showbase.InputStateGlobal import inputState
 from direct.gui.DirectGui import *
 from direct.gui.OnscreenText import OnscreenText
-
+from panda3d.core import WindowProperties
 from panda3d.core import AmbientLight
 from panda3d.core import DirectionalLight
 from panda3d.core import Vec3, CollideMask
@@ -62,7 +62,7 @@ class NeuralNetGA:
         #self.ax('off')
         #self.pw = pg.plot()
         self.w = pg.GraphicsWindow()
-        self.w.setGeometry(800,400,400,400)
+        self.w.setGeometry(870,20,400,400)
         #self.w.resize(200,200)
         self.v = self.w.addViewBox()
         self.v.setAspectLocked()
@@ -189,6 +189,12 @@ class Game(DirectObject):
 
     base.cam.setPos(0, -20, 4)
     base.cam.lookAt(0, 0, 0)
+
+    w = WindowProperties()
+    w.setFullscreen(False)
+    w.setOrigin(5,20)
+    w.setSize(865,800)
+    base.win.requestProperties(w)
 
     # Light
     alight = AmbientLight('ambientLight')
@@ -383,21 +389,21 @@ class Game(DirectObject):
     self.prevPos.append(self.yugoNP.getPos(render))
     dx = numpy.linalg.norm(self.prevPos[-1] - self.prevPos[-2])
     self.distance += dx
-    self.distance_text.setText('Distance=%f'%(self.distance))
+    self.distance_text.setText('Distance=%.3f'%(self.distance))
     #print(len(self.prevPos))
 
     dt = globalClock.getDt()
     self.total_time += dt
     if abs(self.steering) == abs(self.steeringClamp):
         self.time_max_steering += dt
-    self.time_text.setText('TotalTime=%f'%(self.total_time))
-    self.time_maxsteer_text.setText('TotalTimeMaxSteer=%f'%(self.time_max_steering))
+    self.time_text.setText('TotalTime=%.3f'%(self.total_time))
+    #self.time_maxsteer_text.setText('TotalTimeMaxSteer=%f'%(self.time_max_steering))
     #self.penalized_distance = self.distance*(1.-numpy.exp(-self.time_max_steering/self.total_time))
     if self.distance > 10000:
         self.endLoop()
     self.check_prevPos()
     self.speed = dx/dt
-    self.speed_text.setText('Speed=%f'%(self.speed))
+    self.speed_text.setText('Speed=%.3f'%(self.speed))
 
     self.check_collisions()
     self.calculate_moves()
@@ -428,10 +434,10 @@ class Game(DirectObject):
 
   def setup(self):
     self.worldNP = render.attachNewNode('World')
-    self.distance_text = OnscreenText(text='Distance=0', pos = (0.85,0.85), scale = 0.05, mayChange=1)#Directxxxxxx(distance='Distance=%d'%(0))
-    self.speed_text = OnscreenText(text='Speed=0', pos = (0.85,0.80), scale = 0.05, mayChange=1)#Directxxxxxx(distance='Distance=%d'%(0))
-    self.time_text = OnscreenText(text='TotalTime=0', pos = (0.85,0.75), scale = 0.05, mayChange=1)#Directxxxxxx(distance='Distance=%d'%(0))
-    self.time_maxsteer_text = OnscreenText(text='TotalTimeMaxSteer=0', pos = (0.85,0.70), scale = 0.05, mayChange=1)#Directxxxxxx(distance='Distance=%d'%(0))
+    self.distance_text = OnscreenText(text='Distance=0', pos = (0.75,0.85), scale = 0.08, mayChange=1)#Directxxxxxx(distance='Distance=%d'%(0))
+    self.speed_text = OnscreenText(text='Speed=0', pos = (0.75,0.78), scale = 0.08, mayChange=1)#Directxxxxxx(distance='Distance=%d'%(0))
+    self.time_text = OnscreenText(text='TotalTime=0', pos = (0.75,0.71), scale = 0.08, mayChange=1)#Directxxxxxx(distance='Distance=%d'%(0))
+    #self.time_maxsteer_text = OnscreenText(text='TotalTimeMaxSteer=0', pos = (0.85,0.70), scale = 0.05, mayChange=1)#Directxxxxxx(distance='Distance=%d'%(0))
     #self.nn_image = OnscreenImage(image='blank.png', pos= (0.85,0,0.15), scale=0.45) # http://dev-wiki.gestureworks.com/index.php/GestureWorksCore:Python_%26_Panda3D:_Getting_Started_II_(Hello_Multitouch)#8._Create_a_method_to_draw_touchpoint_data
     self.total_time = 0.
     self.time_max_steering = 0.

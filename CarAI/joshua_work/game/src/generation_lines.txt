@@ -1,0 +1,2 @@
+gen	nevals	avg    	min    	max    	std    
+0  	70    	32.3969	2.99072	467.179	71.2039
