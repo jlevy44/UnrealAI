@@ -9,14 +9,14 @@ import random
 # what parameters to set? randomized? can randomize the whole process.
 
 open('out.txt','w').close()
-architecture, activation = [3,4,4,2], 'tanh' # relu
-population_size=70
-generations_number=15
+architecture, activation = [3,5,2], 'tanh' # relu
+population_size=60
+generations_number=80
 gene_mutation_prob=0.15
 gene_crossover_prob = 0.85
-tournament_size = 3
+tournament_size = 8
 rand_init = False
-n_possible_weight_values = 100
+n_possible_weight_values = 1000
 weights_scaling_factor = 30.
 bias_scaling_factor = 20.
 suppress_output = True
